@@ -16,8 +16,8 @@
 
   <p>
     <a href="https://github.com/sitharaj88/novapm/actions/workflows/ci.yml"><img src="https://github.com/sitharaj88/novapm/actions/workflows/ci.yml/badge.svg" alt="CI" /></a>
-    <a href="https://www.npmjs.com/package/novapm"><img src="https://img.shields.io/npm/v/novapm.svg" alt="npm version" /></a>
-    <a href="https://www.npmjs.com/package/novapm"><img src="https://img.shields.io/npm/dm/novapm.svg" alt="npm downloads" /></a>
+    <a href="https://www.npmjs.com/package/@novapm/cli"><img src="https://img.shields.io/npm/v/@novapm/cli.svg" alt="npm version" /></a>
+    <a href="https://www.npmjs.com/package/@novapm/cli"><img src="https://img.shields.io/npm/dm/@novapm/cli.svg" alt="npm downloads" /></a>
     <a href="https://github.com/sitharaj88/novapm/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="License" /></a>
     <a href="https://sitharaj88.github.io/novapm"><img src="https://img.shields.io/badge/docs-Documentation-purple.svg" alt="Documentation" /></a>
   </p>
@@ -42,9 +42,9 @@
 ## Installation
 
 ```bash
-npm install -g novapm
+npm install -g @novapm/cli
 # or
-pnpm add -g novapm
+pnpm add -g @novapm/cli
 ```
 
 ## Quick Start
