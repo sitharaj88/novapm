@@ -1,0 +1,47 @@
+# NovaPM
+
+**Next-generation AI-powered process manager**
+
+NovaPM is a modern, production-grade replacement for PM2. It features AI-driven auto-scaling
+and anomaly detection, a beautiful web dashboard, multi-server distributed management,
+and a plugin ecosystem.
+
+## Quick Start
+
+```bash
+# Install
+npm install -g novapm
+
+# Start a process
+nova start app.js --name my-app
+
+# View all processes
+nova list
+
+# Open monitoring dashboard
+nova dashboard --open
+```
+
+## Why NovaPM?
+
+| Feature | PM2 | NovaPM |
+|---------|-----|--------|
+| Process Management | ✅ | ✅ |
+| Cluster Mode | ✅ | ✅ |
+| Log Management | ✅ | ✅ Enhanced |
+| Web Dashboard | Basic | Beautiful, Real-time |
+| AI Anomaly Detection | ❌ | ✅ |
+| Auto-Scaling | ❌ | ✅ |
+| Natural Language Ops | ❌ | ✅ |
+| Plugin System | ❌ | ✅ |
+| Multi-Server | Limited | Full Agent-Controller |
+| Health Checks | Basic | HTTP, TCP, Script |
+| TypeScript | Partial | Full Strict Mode |
+| Metrics Storage | None | SQLite Time-Series |
+
+## Getting Started
+
+- [Installation](/getting-started/installation)
+- [Quick Start Guide](/getting-started/quick-start)
+- [Configuration](/configuration/config-file)
+- [CLI Reference](/cli/commands)

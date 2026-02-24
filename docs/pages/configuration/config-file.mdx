@@ -1,0 +1,140 @@
+# Configuration File
+
+NovaPM supports multiple configuration file formats:
+
+- `nova.config.ts` (TypeScript)
+- `nova.config.js` (JavaScript)
+- `nova.config.json` (JSON)
+- `nova.config.yaml` (YAML)
+- `ecosystem.config.js` (PM2 compatible)
+
+## Basic Config
+
+```js
+export default {
+  apps: [
+    {
+      name: 'my-app',
+      script: './app.js',
+      instances: 1,
+      autorestart: true,
+    },
+  ],
+};
+```
+
+## Full App Config
+
+```js
+{
+  // Required
+  name: 'api-server',
+  script: './src/server.js',
+
+  // Process options
+  instances: 'max',        // number, 'max', or 'auto'
+  exec_mode: 'cluster',    // 'fork' or 'cluster'
+  interpreter: 'node',
+  node_args: '--max-old-space-size=4096',
+  cwd: '/app',
+  args: '--port 3000',
+
+  // Restart behavior
+  autorestart: true,
+  max_restarts: 16,
+  restart_delay: 1000,
+  exp_backoff_restart_delay: 100,
+  max_memory_restart: '512M',
+  kill_timeout: 5000,
+  cron_restart: '0 0 * * *',
+
+  // Environment
+  env: { NODE_ENV: 'development' },
+  env_production: { NODE_ENV: 'production' },
+
+  // Monitoring
+  watch: false,
+  ignore_watch: ['node_modules', 'logs'],
+  source_map_support: true,
+
+  // Health check
+  health_check: {
+    type: 'http',
+    path: '/health',
+    port: 3000,
+    interval: '30s',
+    timeout: '5s',
+    retries: 3,
+    start_period: '30s',
+  },
+
+  // Auto-scaling
+  scaling: {
+    min: 2,
+    max: 16,
+    cpu_threshold: 70,
+    memory_threshold: 80,
+    cooldown: '5m',
+    ai_enabled: true,
+  },
+
+  // Logging
+  logs: {
+    format: 'json',
+    rotate: { size: '100M', keep: 10, compress: true },
+    timestamp: true,
+  },
+}
+```
+
+## Dashboard Config
+
+```js
+{
+  dashboard: {
+    enabled: true,
+    port: 9615,
+    host: '0.0.0.0',
+    auth: {
+      type: 'basic',
+      username: 'admin',
+      password: 'secret',
+    },
+  },
+}
+```
+
+## AI Config
+
+```js
+{
+  ai: {
+    enabled: true,
+    provider: 'openai',    // 'openai', 'anthropic', 'local'
+    api_key: process.env.OPENAI_API_KEY,
+    model: 'gpt-4',
+    anomaly_detection: true,
+    auto_scaling: true,
+    log_analysis: true,
+  },
+}
+```
+
+## Plugin Config
+
+```js
+{
+  plugins: [
+    {
+      name: '@novapm/plugin-slack',
+      options: {
+        webhookUrl: process.env.SLACK_WEBHOOK,
+        events: ['crash', 'health-check-fail'],
+      },
+    },
+    {
+      name: '@novapm/plugin-prometheus',
+    },
+  ],
+}
+```

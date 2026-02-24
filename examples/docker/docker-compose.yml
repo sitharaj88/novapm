@@ -1,0 +1,47 @@
+version: "3.9"
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: novapm-app
+    restart: unless-stopped
+    ports:
+      # Application port
+      - "3000:3000"
+      # NovaPM dashboard
+      - "9615:9615"
+    volumes:
+      # Persist NovaPM logs across container restarts
+      - novapm-logs:/app/logs
+    environment:
+      NODE_ENV: production
+      PORT: "3000"
+      # Uncomment and configure as needed:
+      # NOVA_DASHBOARD_PORT: "9615"
+      # NOVA_LOG_LEVEL: "info"
+    healthcheck:
+      test: ["CMD", "nova", "ping"]
+      interval: 30s
+      timeout: 5s
+      start_period: 15s
+      retries: 3
+    # Sensible resource limits for a single-container deployment
+    deploy:
+      resources:
+        limits:
+          cpus: "2.0"
+          memory: 1G
+        reservations:
+          cpus: "0.5"
+          memory: 256M
+    logging:
+      driver: json-file
+      options:
+        max-size: "50m"
+        max-file: "5"
+
+volumes:
+  novapm-logs:
+    driver: local

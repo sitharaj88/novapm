@@ -1,0 +1,112 @@
+# CLI Commands
+
+## Process Management
+
+### `nova start`
+
+Start a process or all processes from a config file.
+
+```bash
+nova start <script|config> [options]
+```
+
+**Options:**
+| Flag | Description | Default |
+|------|-------------|---------|
+| `-n, --name <name>` | Process name | Script filename |
+| `-i, --instances <n>` | Number of instances | `1` |
+| `--exec-mode <mode>` | `fork` or `cluster` | `fork` |
+| `-w, --watch` | Watch for file changes | `false` |
+| `--max-memory <size>` | Max memory (e.g., `512M`) | — |
+| `--env <env>` | Environment name | — |
+| `-p, --port <port>` | Application port | — |
+| `--cron <pattern>` | Cron restart pattern | — |
+| `--no-autorestart` | Disable auto-restart | — |
+| `--interpreter <path>` | Custom interpreter | `node` |
+| `--node-args <args>` | Node.js arguments | — |
+| `--cwd <dir>` | Working directory | Current dir |
+
+### `nova stop`
+
+```bash
+nova stop <name|id|all> [--force]
+```
+
+### `nova restart`
+
+```bash
+nova restart <name|id|all>
+```
+
+### `nova delete`
+
+```bash
+nova delete <name|id|all>
+```
+
+### `nova scale`
+
+```bash
+nova scale <name|id> <instances>
+# Examples:
+nova scale api 8      # Set to 8 instances
+nova scale api +2     # Add 2 instances
+nova scale api -1     # Remove 1 instance
+```
+
+## Information
+
+### `nova list`
+
+```bash
+nova list [--json]
+```
+
+### `nova info`
+
+```bash
+nova info <name|id> [--json]
+```
+
+### `nova logs`
+
+```bash
+nova logs [name|id] [options]
+```
+
+| Flag | Description | Default |
+|------|-------------|---------|
+| `-l, --lines <n>` | Lines to show | `50` |
+| `-f, --follow` | Stream new logs | `false` |
+| `--json` | Output as JSON | `false` |
+
+### `nova monit`
+
+Real-time terminal monitoring dashboard.
+
+```bash
+nova monit
+```
+
+## System
+
+### `nova ping`
+Check if the daemon is running.
+
+### `nova save`
+Save current process list for restoration.
+
+### `nova resurrect`
+Restore previously saved process list.
+
+### `nova startup`
+Generate OS startup script (systemd, launchd).
+
+### `nova dashboard`
+Open the web dashboard.
+
+### `nova init`
+Generate a `nova.config.js` file interactively.
+
+### `nova doctor`
+Diagnose NovaPM installation.

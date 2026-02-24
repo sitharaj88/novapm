@@ -1,0 +1,72 @@
+# Quick Start
+
+## Start Your First Process
+
+```bash
+nova start app.js --name my-app
+```
+
+## View Running Processes
+
+```bash
+nova list
+```
+
+Output:
+```
+┌──────┬────────────┬───┬──────┬───────┬────────┬──────────┬────────┬──────┐
+│ id   │ name       │   │ pid  │ cpu   │ memory │ restarts │ uptime │ mode │
+├──────┼────────────┼───┼──────┼───────┼────────┼──────────┼────────┼──────┤
+│ 1    │ my-app     │ ● │ 1234 │ 2.1%  │ 45 MB  │ 0        │ 5m     │ fork │
+└──────┴────────────┴───┴──────┴───────┴────────┴──────────┴────────┴──────┘
+```
+
+## Use a Config File
+
+Create `nova.config.js`:
+
+```js
+export default {
+  apps: [{
+    name: 'api',
+    script: './server.js',
+    instances: 4,
+    exec_mode: 'cluster',
+    env: { NODE_ENV: 'production' },
+  }],
+};
+```
+
+Then start all apps:
+
+```bash
+nova start nova.config.js
+```
+
+## Monitor in Real-Time
+
+```bash
+nova monit
+```
+
+## Open Web Dashboard
+
+```bash
+nova dashboard --open
+```
+
+## View Logs
+
+```bash
+nova logs my-app --follow
+```
+
+## Save and Restore
+
+```bash
+# Save current process list
+nova save
+
+# After reboot, restore
+nova resurrect
+```

@@ -1,0 +1,72 @@
+# AI Features
+
+NovaPM includes built-in AI capabilities that help you monitor, optimize, and manage your applications.
+
+## Anomaly Detection
+
+NovaPM automatically detects unusual patterns in your application metrics using statistical methods:
+
+### Detection Methods
+
+1. **Z-Score Detection** — Flags values more than 3 standard deviations from the rolling mean
+2. **IQR (Interquartile Range)** — Robust outlier detection using Q1/Q3 boundaries
+3. **Moving Average Deviation** — Detects sudden spikes against exponential moving average
+4. **Rate of Change** — Catches rapid increases like memory leaks
+5. **Pattern Detection** — Identifies memory leaks, restart loops, error rate spikes
+
+### Types of Anomalies Detected
+
+- **Memory Leak** — Sustained upward trend in memory usage
+- **CPU Spike** — Sudden or sustained high CPU utilization
+- **Error Rate Increase** — Abnormal increase in error frequency
+- **Latency Degradation** — Increasing response times
+- **Restart Loop** — Process repeatedly crashing and restarting
+
+## Auto-Scaling
+
+Dynamically adjusts the number of process instances based on load.
+
+```js
+scaling: {
+  min: 2,
+  max: 16,
+  cpu_threshold: 70,
+  memory_threshold: 80,
+  cooldown: '5m',
+  scale_up_step: 2,
+  scale_down_step: 1,
+  ai_enabled: true,
+}
+```
+
+### Scaling Logic
+
+- **Scale Up**: When average CPU exceeds threshold for the cooldown period
+- **Scale Down**: When average CPU is below threshold/2 for 2x cooldown period
+- **Predictive**: Uses historical patterns to anticipate load spikes
+- **Safety**: Min/max limits, cooldown between events, no scaling during deploys
+
+## LLM Integration
+
+Connect to an AI model for advanced analysis:
+
+```js
+ai: {
+  enabled: true,
+  provider: 'openai',      // 'openai', 'anthropic', 'local'
+  api_key: process.env.OPENAI_API_KEY,
+  model: 'gpt-4',
+}
+```
+
+### Capabilities
+
+- **Root Cause Analysis** — Automatically analyzes logs and metrics when a process crashes
+- **Log Summarization** — Summarizes error patterns and identifies correlations
+- **Performance Advisor** — Recommends optimal instance counts and memory limits
+- **Natural Language Queries** — Ask questions about your infrastructure
+
+```bash
+nova ask "why did my api server crash at 3am?"
+nova ask "what is causing high memory usage on the worker process?"
+```

@@ -1,0 +1,267 @@
+import { Callout } from 'nextra/components'
+
+# Health Checks
+
+NovaPM supports configurable health checks to monitor the liveness of your processes. When a health check fails, NovaPM can automatically restart the process to maintain availability.
+
+## Health Check Types
+
+NovaPM supports three types of health checks:
+
+- **HTTP** -- Sends an HTTP request to an endpoint and expects a successful response
+- **TCP** -- Attempts a TCP connection to a port
+- **Script** -- Runs a custom script and checks the exit code
+
+## HTTP Health Checks
+
+HTTP health checks send a GET request to a specified endpoint and consider the check successful if the response status code is in the 2xx range.
+
+```typescript
+// nova.config.ts
+export default {
+  apps: [{
+    name: "web-api",
+    script: "./server.js",
+    health_check: {
+      type: "http",
+      endpoint: "http://localhost:3000/health",
+      interval: 30000,       // Check every 30 seconds
+      timeout: 5000,         // Timeout after 5 seconds
+      retries: 3,            // Fail after 3 consecutive failures
+      initial_delay: 10000,  // Wait 10s before first check
+    }
+  }]
+}
+```
+
+**Endpoint requirements:**
+
+Your application should expose a health endpoint that returns a 200 status when healthy:
+
+```javascript
+// Express example
+app.get('/health', (req, res) => {
+  const dbConnected = checkDatabaseConnection();
+  const cacheReady = checkCacheConnection();
+
+  if (dbConnected && cacheReady) {
+    res.status(200).json({ status: 'healthy' });
+  } else {
+    res.status(503).json({ status: 'unhealthy', db: dbConnected, cache: cacheReady });
+  }
+});
+```
+
+<Callout type="info">
+Keep health check endpoints lightweight. Avoid running expensive queries or computations -- the endpoint should verify connectivity, not full functionality.
+</Callout>
+
+### Custom Headers and Methods
+
+For more advanced HTTP health checks:
+
+```typescript
+health_check: {
+  type: "http",
+  endpoint: "http://localhost:3000/health",
+  method: "GET",
+  headers: {
+    "Authorization": "Bearer health-check-token",
+    "Accept": "application/json"
+  },
+  expected_status: 200,
+}
+```
+
+## TCP Health Checks
+
+TCP health checks verify that a process is listening on a specific port. This is useful for services that do not expose an HTTP endpoint, such as databases, message brokers, or raw TCP servers.
+
+```typescript
+export default {
+  apps: [{
+    name: "tcp-service",
+    script: "./service.js",
+    health_check: {
+      type: "tcp",
+      port: 8080,
+      host: "127.0.0.1",     // Default: 127.0.0.1
+      interval: 15000,
+      timeout: 3000,
+      retries: 3,
+      initial_delay: 5000,
+    }
+  }]
+}
+```
+
+The check succeeds if a TCP connection can be established within the timeout period. The connection is immediately closed after a successful handshake.
+
+<Callout type="warning">
+TCP health checks only verify that the port is open. They do not validate that the service is responding correctly. Use HTTP or script-based checks for deeper validation.
+</Callout>
+
+## Script-Based Health Checks
+
+Script health checks run a custom script or command. The check is considered successful if the script exits with code `0`.
+
+```typescript
+export default {
+  apps: [{
+    name: "worker",
+    script: "./worker.js",
+    health_check: {
+      type: "script",
+      script: "./checks/worker-health.sh",
+      interval: 60000,
+      timeout: 10000,
+      retries: 2,
+      initial_delay: 15000,
+    }
+  }]
+}
+```
+
+**Example health check script:**
+
+```bash
+#!/bin/bash
+# checks/worker-health.sh
+
+# Check if the worker's queue is responsive
+QUEUE_SIZE=$(redis-cli LLEN worker:queue 2>/dev/null)
+
+if [ $? -ne 0 ]; then
+  echo "Cannot connect to Redis"
+  exit 1
+fi
+
+if [ "$QUEUE_SIZE" -gt 10000 ]; then
+  echo "Queue backlog too large: $QUEUE_SIZE"
+  exit 1
+fi
+
+echo "Worker healthy, queue size: $QUEUE_SIZE"
+exit 0
+```
+
+<Callout type="info">
+Script health checks receive the process name and PID as environment variables: `NOVA_PROCESS_NAME` and `NOVA_PROCESS_PID`.
+</Callout>
+
+## Configuration Options
+
+All health check types share these common options:
+
+| Option | Type | Default | Description |
+|---|---|---|---|
+| `interval` | number | `30000` | Milliseconds between health checks |
+| `timeout` | number | `5000` | Milliseconds before a check is considered failed |
+| `retries` | number | `3` | Consecutive failures before triggering a restart |
+| `initial_delay` | number | `0` | Milliseconds to wait after process start before first check |
+| `enabled` | boolean | `true` | Enable or disable the health check |
+
+### Choosing the Right Interval
+
+- **Web servers:** 15-30 seconds is typical
+- **Background workers:** 30-60 seconds is usually sufficient
+- **CPU-intensive tasks:** Use longer intervals (60-120s) to avoid false positives during heavy processing
+
+```typescript
+// Example: Aggressive health checking for a critical API
+health_check: {
+  type: "http",
+  endpoint: "http://localhost:3000/health",
+  interval: 10000,
+  timeout: 3000,
+  retries: 2,
+  initial_delay: 5000,
+}
+```
+
+## Auto-Restart Behavior
+
+When a health check fails beyond the configured retry count, NovaPM will:
+
+1. Log the failure with details to the daemon log
+2. Emit a `health:check:failed` event (available via the API)
+3. Perform a graceful restart of the process
+4. Reset the health check retry counter
+5. Wait for `initial_delay` before resuming health checks
+
+```
+[2026-02-23 10:15:32] WARN  Health check failed for "web-api" (attempt 3/3)
+[2026-02-23 10:15:32] INFO  Restarting "web-api" due to health check failure
+[2026-02-23 10:15:33] INFO  Process "web-api" restarted successfully (PID: 48291)
+```
+
+<Callout type="warning">
+If a process fails health checks repeatedly after restarts, NovaPM respects the `max_restarts` setting and will eventually mark the process as `errored` to prevent infinite restart loops.
+</Callout>
+
+## Monitoring Health Check Status
+
+**View health check status from the CLI:**
+
+```bash
+nova health
+```
+
+Output:
+
+```
+┌──────────┬────────┬──────────┬───────────┬─────────────────────┐
+│ App      │ Type   │ Status   │ Failures  │ Last Check          │
+├──────────┼────────┼──────────┼───────────┼─────────────────────┤
+│ web-api  │ http   │ healthy  │ 0         │ 2026-02-23 10:14:02 │
+│ worker   │ script │ healthy  │ 0         │ 2026-02-23 10:14:15 │
+│ cache    │ tcp    │ failing  │ 2/3       │ 2026-02-23 10:14:30 │
+└──────────┴────────┴──────────┴───────────┴─────────────────────┘
+```
+
+## Complete Example
+
+A full configuration with multiple apps and different health check types:
+
+```typescript
+// nova.config.ts
+export default {
+  apps: [
+    {
+      name: "api",
+      script: "./api/server.js",
+      instances: 4,
+      health_check: {
+        type: "http",
+        endpoint: "http://localhost:3000/health",
+        interval: 15000,
+        timeout: 3000,
+        retries: 3,
+        initial_delay: 8000,
+      }
+    },
+    {
+      name: "worker",
+      script: "./worker/index.js",
+      health_check: {
+        type: "script",
+        script: "./checks/worker-health.sh",
+        interval: 60000,
+        timeout: 10000,
+        retries: 2,
+        initial_delay: 5000,
+      }
+    },
+    {
+      name: "metrics-collector",
+      script: "./metrics/collector.js",
+      health_check: {
+        type: "tcp",
+        port: 9100,
+        interval: 30000,
+        retries: 3,
+      }
+    }
+  ]
+}
+```

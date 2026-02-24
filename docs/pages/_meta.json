@@ -1,0 +1,12 @@
+{
+  "index": "Introduction",
+  "getting-started": "Getting Started",
+  "cli": "CLI Reference",
+  "configuration": "Configuration",
+  "dashboard": "Dashboard",
+  "ai": "AI Features",
+  "plugins": "Plugins",
+  "multi-server": "Multi-Server",
+  "guides": "Guides",
+  "api": "API Reference"
+}

@@ -1,0 +1,38 @@
+{
+  "name": "@novapm/plugin-slack",
+  "version": "0.2.0",
+  "description": "Slack notification plugin for NovaPM",
+  "license": "MIT",
+  "author": "Sitharaj Seenviasan",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sitharaj88/novapm.git",
+    "directory": "plugins/plugin-slack"
+  },
+  "homepage": "https://novapm.dev",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "clean": "rm -rf dist",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run --passWithNoTests",
+    "lint": "eslint src/"
+  },
+  "dependencies": {
+    "@novapm/plugin-sdk": "workspace:*",
+    "@novapm/shared": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.0",
+    "vitest": "^2.1.0"
+  }
+}

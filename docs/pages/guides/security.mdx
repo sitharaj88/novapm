@@ -1,0 +1,292 @@
+import { Callout } from 'nextra/components'
+
+# Security
+
+This guide covers security best practices for deploying NovaPM in production environments, including authentication, encryption, and access control.
+
+## Agent-Controller Authentication
+
+When running NovaPM in multi-server mode, agents communicate with the controller over the network. This communication must be authenticated using shared tokens.
+
+**Generate a secure token:**
+
+```bash
+nova token generate
+```
+
+**Configure the controller:**
+
+```typescript
+// nova.config.ts
+export default {
+  controller: {
+    port: 9800,
+    auth: {
+      token: process.env.NOVA_AUTH_TOKEN,
+    }
+  }
+}
+```
+
+**Configure agents to connect with the token:**
+
+```bash
+nova agent connect <controller-host>:9800 --token $NOVA_AUTH_TOKEN
+```
+
+<Callout type="warning">
+Never hardcode tokens in configuration files. Always use environment variables or a secrets manager. Tokens stored in plaintext in config files can be exposed through version control or server access.
+</Callout>
+
+### Token Rotation
+
+Rotate tokens periodically to limit the blast radius of a compromised credential:
+
+```bash
+# Generate a new token
+nova token generate --save
+
+# Update all agents (rolling update)
+nova agent update-token --new-token $NEW_NOVA_AUTH_TOKEN
+
+# Revoke the old token on the controller
+nova token revoke <old-token-id>
+```
+
+## TLS/SSL Setup
+
+Encrypt all communication between agents and the controller using TLS.
+
+**Generate certificates (or use your own CA-signed certificates):**
+
+```bash
+# Generate a self-signed certificate for development
+nova tls generate --out ~/.nova/certs/
+
+# This creates:
+#   ~/.nova/certs/server.key
+#   ~/.nova/certs/server.crt
+#   ~/.nova/certs/ca.crt
+```
+
+**Configure TLS on the controller:**
+
+```typescript
+export default {
+  controller: {
+    port: 9800,
+    tls: {
+      enabled: true,
+      key: "/etc/nova/certs/server.key",
+      cert: "/etc/nova/certs/server.crt",
+      ca: "/etc/nova/certs/ca.crt",
+    }
+  }
+}
+```
+
+**Configure TLS on agents:**
+
+```bash
+nova agent connect <controller-host>:9800 \
+  --tls \
+  --ca /etc/nova/certs/ca.crt
+```
+
+<Callout type="info">
+In production, always use certificates signed by a trusted Certificate Authority rather than self-signed certificates. Services like Let's Encrypt provide free CA-signed certificates.
+</Callout>
+
+## API Authentication
+
+The NovaPM REST API supports token-based authentication to prevent unauthorized access.
+
+**Enable API authentication:**
+
+```typescript
+export default {
+  api: {
+    port: 9900,
+    auth: {
+      enabled: true,
+      tokens: [
+        { id: "admin", token: process.env.NOVA_API_ADMIN_TOKEN, role: "admin" },
+        { id: "readonly", token: process.env.NOVA_API_READ_TOKEN, role: "viewer" },
+      ]
+    }
+  }
+}
+```
+
+**Making authenticated API requests:**
+
+```bash
+curl -H "Authorization: Bearer $NOVA_API_ADMIN_TOKEN" \
+  http://localhost:9900/api/v1/processes
+```
+
+### Role-Based Access
+
+| Role | Permissions |
+|---|---|
+| `admin` | Full access: start, stop, restart, delete, configure |
+| `operator` | Manage processes: start, stop, restart |
+| `viewer` | Read-only: list processes, view logs, view metrics |
+
+## Secret Management
+
+NovaPM provides secure handling of environment variables passed to managed processes.
+
+**Set secrets via the CLI (not stored in config files):**
+
+```bash
+nova env set my-app DATABASE_URL "postgresql://user:pass@host/db" --secret
+nova env set my-app API_KEY "sk-abc123" --secret
+```
+
+Secrets set with `--secret` are encrypted at rest in the NovaPM database and masked in log output and the dashboard.
+
+**Reference secrets in your config:**
+
+```typescript
+export default {
+  apps: [{
+    name: "my-app",
+    script: "./app.js",
+    env: {
+      NODE_ENV: "production",
+      PORT: 3000,
+      // Non-sensitive variables can be specified directly
+    }
+    // Secrets set via `nova env set` are automatically injected
+  }]
+}
+```
+
+<Callout type="warning">
+Avoid passing secrets through the `env` block in configuration files. Use `nova env set --secret` to keep sensitive values out of version control and encrypt them at rest.
+</Callout>
+
+## Network Security
+
+### Binding Address
+
+By default, the NovaPM daemon listens on `127.0.0.1` (localhost only). If you need remote access, be explicit about the bind address:
+
+```typescript
+export default {
+  daemon: {
+    host: "127.0.0.1",  // Default: localhost only
+    port: 9876,
+  },
+  api: {
+    host: "0.0.0.0",    // Expose API on all interfaces
+    port: 9900,
+  }
+}
+```
+
+<Callout type="warning">
+Never bind the daemon or API to `0.0.0.0` without enabling authentication and TLS. Unauthenticated access to the NovaPM API allows full control over all managed processes.
+</Callout>
+
+### Firewall Rules
+
+Restrict access to NovaPM ports:
+
+```bash
+# Allow only specific IPs to access the controller
+ufw allow from 10.0.1.0/24 to any port 9800 proto tcp
+
+# Allow API access from your monitoring subnet
+ufw allow from 10.0.2.0/24 to any port 9900 proto tcp
+
+# Block all other access to NovaPM ports
+ufw deny 9800
+ufw deny 9876
+ufw deny 9900
+```
+
+## File Permissions for NOVA_HOME
+
+The `NOVA_HOME` directory (default: `~/.nova`) contains sensitive data including process configurations, encrypted secrets, and logs.
+
+**Recommended permissions:**
+
+```bash
+# Set restrictive permissions on NOVA_HOME
+chmod 700 ~/.nova
+chmod 700 ~/.nova/db
+chmod 600 ~/.nova/db/nova.db
+chmod 700 ~/.nova/logs
+chmod 700 ~/.nova/certs
+chmod 600 ~/.nova/certs/*.key
+```
+
+**Verify permissions:**
+
+```bash
+nova doctor --check permissions
+```
+
+<Callout type="info">
+When running NovaPM as a system service, create a dedicated `nova` user and group. Set `NOVA_HOME` to a directory owned by that user, such as `/var/lib/nova`.
+</Callout>
+
+## Secure WebSocket Connections
+
+The NovaPM dashboard uses WebSocket connections for real-time updates. Secure these connections in production:
+
+```typescript
+export default {
+  dashboard: {
+    port: 9443,
+    tls: {
+      enabled: true,
+      key: "/etc/nova/certs/server.key",
+      cert: "/etc/nova/certs/server.crt",
+    },
+    cors: {
+      origin: ["https://admin.example.com"],
+    },
+    auth: {
+      enabled: true,
+    }
+  }
+}
+```
+
+**Nginx reverse proxy example for WebSocket support:**
+
+```nginx
+server {
+    listen 443 ssl;
+    server_name nova.example.com;
+
+    ssl_certificate /etc/letsencrypt/live/nova.example.com/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/nova.example.com/privkey.pem;
+
+    location / {
+        proxy_pass http://127.0.0.1:9443;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+    }
+}
+```
+
+## Security Checklist
+
+Before deploying NovaPM to production, verify:
+
+- [ ] Authentication tokens are set via environment variables, not config files
+- [ ] TLS is enabled for all agent-controller and API communication
+- [ ] API authentication is enabled with role-based access
+- [ ] Daemon and API are bound to appropriate interfaces
+- [ ] Firewall rules restrict access to NovaPM ports
+- [ ] `NOVA_HOME` directory has restrictive file permissions
+- [ ] Secrets are stored with `nova env set --secret`, not in config files
+- [ ] WebSocket connections use WSS (TLS) in production
+- [ ] Log output does not contain sensitive data

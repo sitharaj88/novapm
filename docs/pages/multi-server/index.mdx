@@ -1,0 +1,92 @@
+# Multi-Server Management
+
+NovaPM supports managing processes across multiple servers using an agent-controller architecture.
+
+## Architecture
+
+```
+┌─────────────────────────┐
+│    Controller (Primary)  │
+│  - Aggregates metrics    │
+│  - Coordinates deploys   │
+│  - Serves dashboard      │
+│  - WebSocket server      │
+└──────────┬──────────────┘
+           │
+    ┌──────┼──────┐
+    │      │      │
+┌───▼──┐┌──▼──┐┌──▼───┐
+│Agent 1││Agent 2││Agent 3│
+│Server ││Server ││Server │
+└───────┘└──────┘└───────┘
+```
+
+## Setup
+
+### Start Controller
+
+```bash
+nova controller start --port 9616
+```
+
+### Start Agent on Each Server
+
+```bash
+nova agent start --controller controller-host:9616
+```
+
+Or via environment variables:
+
+```bash
+export NOVA_CONTROLLER_HOST=controller-host
+export NOVA_CONTROLLER_PORT=9616
+nova agent start
+```
+
+## Deployment Strategies
+
+### Rolling Deploy
+
+Deploy one server at a time with health checks.
+
+```bash
+nova deploy production --strategy rolling
+```
+
+### Canary Deploy
+
+Deploy to a subset of servers, monitor, then roll out.
+
+```bash
+nova deploy production --strategy canary --canary-weight 10
+```
+
+### Blue-Green Deploy
+
+Deploy to standby servers, switch traffic, keep old as rollback.
+
+```bash
+nova deploy production --strategy blue-green
+```
+
+## Server Management
+
+```bash
+# List connected servers
+nova server list
+
+# View server status
+nova server status web-01
+
+# Add server manually
+nova server add web-04.example.com:9616
+
+# Remove server
+nova server remove web-04
+```
+
+## Security
+
+- **Token Authentication** — Agents authenticate with the controller using tokens
+- **Encrypted Transport** — WebSocket connections can use TLS
+- **Certificate Management** — Built-in certificate generation and rotation

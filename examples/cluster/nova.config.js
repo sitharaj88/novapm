@@ -1,0 +1,48 @@
+export default {
+  apps: [
+    {
+      name: 'web-server',
+      script: './server.js',
+      instances: 'max',
+      exec_mode: 'cluster',
+      port: 8080,
+      autorestart: true,
+      max_restarts: 20,
+      restart_delay: 1000,
+      exp_backoff_restart_delay: 100,
+      max_memory_restart: '1G',
+      kill_timeout: 10000,
+      listen_timeout: 10000,
+      source_map_support: true,
+      merge_logs: true,
+      env: {
+        NODE_ENV: 'production',
+        PORT: '8080',
+      },
+      health_check: {
+        type: 'http',
+        path: '/health',
+        port: 8080,
+        interval: '15s',
+        timeout: '3s',
+        retries: 3,
+        start_period: '30s',
+      },
+      scaling: {
+        min: 2,
+        max: 16,
+        cpu_threshold: 70,
+        memory_threshold: 80,
+        cooldown: '5m',
+        scale_up_step: 2,
+        scale_down_step: 1,
+        ai_enabled: true,
+      },
+      logs: {
+        format: 'json',
+        rotate: { size: '200M', keep: 14, compress: true },
+        timestamp: true,
+      },
+    },
+  ],
+};

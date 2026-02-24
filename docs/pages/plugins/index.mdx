@@ -1,0 +1,113 @@
+# Plugins
+
+NovaPM has a rich plugin ecosystem that extends its functionality.
+
+## Official Plugins
+
+### @novapm/plugin-slack
+Send notifications to Slack channels when events occur.
+
+```js
+plugins: [{
+  name: '@novapm/plugin-slack',
+  options: {
+    webhookUrl: 'https://hooks.slack.com/services/...',
+    events: ['crash', 'health-check-fail', 'scaling'],
+  },
+}]
+```
+
+### @novapm/plugin-discord
+Discord webhook notifications with rich embeds.
+
+```js
+plugins: [{
+  name: '@novapm/plugin-discord',
+  options: {
+    webhookUrl: 'https://discord.com/api/webhooks/...',
+    events: ['crash', 'start', 'stop'],
+  },
+}]
+```
+
+### @novapm/plugin-prometheus
+Export metrics in Prometheus format at `/metrics`.
+
+```js
+plugins: [{
+  name: '@novapm/plugin-prometheus',
+}]
+```
+
+### @novapm/plugin-docker
+Docker container awareness and resource limit detection.
+
+### @novapm/plugin-github-deploy
+Deploy on GitHub push events via webhooks.
+
+```js
+plugins: [{
+  name: '@novapm/plugin-github-deploy',
+  options: {
+    secret: process.env.GITHUB_WEBHOOK_SECRET,
+    branch: 'main',
+    command: 'git pull && pnpm install && nova restart all',
+  },
+}]
+```
+
+### @novapm/plugin-email
+Email notifications for critical events.
+
+## Creating a Plugin
+
+```bash
+nova plugin create my-custom-plugin
+```
+
+This generates a plugin template with:
+- `package.json` with `@novapm/plugin-sdk` dependency
+- `src/index.ts` with example hooks
+- `tsconfig.json` configured for NovaPM
+
+### Plugin Interface
+
+```typescript
+import type { NovaPMPlugin } from '@novapm/plugin-sdk';
+
+const myPlugin: NovaPMPlugin = {
+  name: 'my-plugin',
+  version: '1.0.0',
+
+  async onInit(context) {
+    context.logger.info('Plugin initialized');
+  },
+
+  async onProcessCrash(event) {
+    // Handle crash
+  },
+
+  async onMetricsCollected(metrics) {
+    // Process metrics
+  },
+};
+
+export default myPlugin;
+```
+
+### Available Hooks
+
+| Hook | Description |
+|------|-------------|
+| `onInit` | Plugin initialized with context |
+| `onDestroy` | Plugin being unloaded |
+| `onProcessStart` | Process started |
+| `onProcessStop` | Process stopped |
+| `onProcessRestart` | Process restarted |
+| `onProcessCrash` | Process crashed |
+| `onMetricsCollected` | New metrics available |
+| `onSystemMetrics` | System metrics updated |
+| `onLogEntry` | New log entry |
+| `onHealthCheckFail` | Health check failed |
+| `onHealthCheckRestore` | Health restored |
+| `onConfigChange` | Configuration changed |

@@ -1,0 +1,295 @@
+import { Callout } from 'nextra/components'
+
+# Performance Tuning
+
+This guide covers strategies for optimizing NovaPM and your managed processes for maximum throughput and efficiency in production environments.
+
+## Cluster Mode Optimization
+
+Cluster mode runs multiple instances of your application, distributing load across CPU cores. NovaPM uses Node.js cluster module under the hood with configurable load balancing.
+
+```typescript
+// nova.config.ts
+export default {
+  apps: [{
+    name: "api",
+    script: "./server.js",
+    instances: "max",       // One instance per CPU core
+    exec_mode: "cluster",
+    listen_timeout: 8000,   // Wait 8s for the app to listen before considering it ready
+  }]
+}
+```
+
+**Load balancing strategies:**
+
+```typescript
+export default {
+  apps: [{
+    name: "api",
+    script: "./server.js",
+    instances: "max",
+    exec_mode: "cluster",
+    cluster: {
+      scheduling_policy: "round_robin",  // or "os" to let the OS handle it
+    }
+  }]
+}
+```
+
+<Callout type="info">
+On Linux, `round_robin` typically provides more even distribution. On macOS and Windows, `os` scheduling may perform better in some workloads.
+</Callout>
+
+### Graceful Reload in Cluster Mode
+
+Use `nova reload` instead of `nova restart` for zero-downtime deployments. NovaPM restarts instances one at a time, waiting for each to become ready before proceeding:
+
+```bash
+nova reload api
+```
+
+Configure the reload behavior:
+
+```typescript
+{
+  kill_timeout: 5000,       // Time to wait for graceful shutdown
+  listen_timeout: 10000,    // Time to wait for new instance to be ready
+  shutdown_with_message: true,  // Send shutdown message instead of SIGINT
+}
+```
+
+## Instance Count Tuning
+
+The optimal number of instances depends on your workload type.
+
+### CPU-Bound Applications
+
+For applications that perform heavy computation (image processing, data crunching, cryptography):
+
+```typescript
+{
+  instances: "max",  // Use all available CPU cores
+}
+```
+
+Each instance gets its own core, maximizing parallel computation. Do not exceed the number of physical cores.
+
+### I/O-Bound Applications
+
+For applications that spend most time waiting on network or disk I/O (typical web APIs, database-driven apps):
+
+```typescript
+{
+  instances: Math.ceil(require('os').cpus().length * 0.75),
+}
+```
+
+<Callout type="info">
+I/O-bound applications rarely benefit from using all CPU cores. Leaving 1-2 cores free for the OS, NovaPM daemon, and other system services improves overall stability. Start with 75% of available cores and benchmark from there.
+</Callout>
+
+### Benchmarking Instance Count
+
+Use load testing to find the optimal number:
+
+```bash
+# Test with different instance counts
+for i in 1 2 4 8; do
+  nova scale api $i
+  sleep 5  # Wait for stabilization
+  wrk -t4 -c100 -d30s http://localhost:3000/
+done
+```
+
+## Memory Limits and max_memory_restart
+
+Prevent memory leaks from degrading your entire system by setting memory thresholds:
+
+```typescript
+export default {
+  apps: [{
+    name: "api",
+    script: "./server.js",
+    max_memory_restart: "500M",  // Restart if memory exceeds 500MB
+  }]
+}
+```
+
+**Supported units:** `K` (kilobytes), `M` (megabytes), `G` (gigabytes).
+
+<Callout type="warning">
+Set `max_memory_restart` below your server's available memory divided by the number of instances. For example, with 4GB RAM and 4 instances, keep each instance under 800MB to leave room for the OS.
+</Callout>
+
+**Monitor memory usage over time:**
+
+```bash
+nova metrics api --metric memory --period 24h
+```
+
+## Log Rotation for Disk Space
+
+Unmanaged logs can fill up disks and degrade performance. Configure log rotation to keep log I/O efficient:
+
+```typescript
+export default {
+  apps: [{
+    name: "api",
+    script: "./server.js",
+    max_log_size: "50M",    // Rotate when log exceeds 50MB
+    retain_logs: 5,         // Keep 5 rotated log files
+    merge_logs: true,       // Merge stdout and stderr from all instances
+    log_date_format: "YYYY-MM-DD HH:mm:ss",
+  }]
+}
+```
+
+For high-throughput applications, consider sending logs to an external service to reduce disk I/O:
+
+```typescript
+{
+  disable_logs: true,  // Disable NovaPM log files entirely
+  // Use your application's logging library to send to stdout,
+  // then pipe to an external log aggregator
+}
+```
+
+## Metrics Collection Interval
+
+NovaPM collects process metrics (CPU, memory, event loop latency) at regular intervals. The default interval is 5 seconds. For large deployments, tuning this value reduces overhead:
+
+```typescript
+export default {
+  metrics: {
+    collection_interval: 10000,  // Collect every 10 seconds (default: 5000)
+    enabled_metrics: [
+      "cpu",
+      "memory",
+      "event_loop_latency",
+      "active_handles",
+    ]
+  }
+}
+```
+
+<Callout type="info">
+Each metric collection involves reading from `/proc` (Linux) or calling system APIs. With many managed processes, reducing the collection frequency from 5s to 15s can noticeably lower the daemon's CPU usage.
+</Callout>
+
+**Disable metrics entirely for non-critical processes:**
+
+```typescript
+{
+  name: "cron-job",
+  script: "./cron.js",
+  metrics: { enabled: false }
+}
+```
+
+## Database Downsample Configuration
+
+NovaPM stores historical metrics in its internal database. Over time, this data grows and can slow queries. Configure downsampling to aggregate old data:
+
+```typescript
+export default {
+  metrics: {
+    downsample: {
+      "1h": "5s",    // Keep 5-second resolution for the last hour
+      "24h": "1m",   // Keep 1-minute resolution for the last 24 hours
+      "7d": "15m",   // Keep 15-minute resolution for the last 7 days
+      "30d": "1h",   // Keep 1-hour resolution for the last 30 days
+    },
+    retention: "90d",  // Delete data older than 90 days
+  }
+}
+```
+
+**Manually trigger compaction if the database has grown large:**
+
+```bash
+nova db compact
+```
+
+## Node.js Flags for Production
+
+Pass Node.js runtime flags to optimize V8 for your workload:
+
+```typescript
+export default {
+  apps: [{
+    name: "api",
+    script: "./server.js",
+    node_args: [
+      "--max-old-space-size=512",      // Limit V8 heap to 512MB
+      "--max-semi-space-size=64",      // Increase young generation for allocation-heavy apps
+      "--optimize-for-size",           // Prefer smaller memory footprint
+    ]
+  }]
+}
+```
+
+**Common production flags:**
+
+| Flag | Use Case |
+|---|---|
+| `--max-old-space-size=N` | Cap heap memory (in MB) |
+| `--max-semi-space-size=N` | Tune GC for allocation-heavy workloads (in MB) |
+| `--optimize-for-size` | Reduce memory footprint at slight CPU cost |
+| `--expose-gc` | Allow manual GC triggering (for advanced profiling) |
+| `--enable-source-maps` | Enable stack traces for transpiled code |
+
+<Callout type="warning">
+Avoid setting `--max-old-space-size` higher than your `max_memory_restart` value. If the V8 heap limit is higher, Node.js may crash with an out-of-memory error before NovaPM can gracefully restart it.
+</Callout>
+
+## AI Engine Resource Usage
+
+NovaPM's AI engine analyzes metrics to predict issues and suggest optimizations. The AI engine consumes additional resources:
+
+```typescript
+export default {
+  ai: {
+    enabled: true,
+    analysis_interval: 300000,  // Run analysis every 5 minutes (default: 60000)
+    max_memory: "256M",         // Limit AI engine memory
+    features: {
+      anomaly_detection: true,
+      predictive_scaling: false,  // Disable if not needed
+      log_analysis: true,
+    }
+  }
+}
+```
+
+**Reduce AI resource usage for resource-constrained environments:**
+
+```typescript
+{
+  ai: {
+    enabled: true,
+    analysis_interval: 600000,  // Every 10 minutes
+    max_memory: "128M",
+    features: {
+      anomaly_detection: true,
+      predictive_scaling: false,
+      log_analysis: false,       // Disable log analysis to save CPU
+    }
+  }
+}
+```
+
+<Callout type="info">
+On single-core machines or containers with limited CPU, consider disabling the AI engine entirely and relying on manual monitoring and health checks instead.
+</Callout>
+
+## Performance Checklist
+
+- [ ] Use cluster mode with an appropriate number of instances for your workload
+- [ ] Set `max_memory_restart` on all production processes
+- [ ] Configure log rotation to prevent disk space exhaustion
+- [ ] Tune metrics collection interval for your deployment size
+- [ ] Configure database downsampling and retention
+- [ ] Pass appropriate Node.js flags for production
+- [ ] Adjust AI engine frequency based on available resources
+- [ ] Use `nova reload` for zero-downtime deploys in cluster mode

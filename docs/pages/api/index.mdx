@@ -1,0 +1,127 @@
+# API Reference
+
+NovaPM exposes a REST API and WebSocket endpoints for programmatic access.
+
+## Base URL
+
+```
+http://localhost:9615/api/v1
+```
+
+## REST Endpoints
+
+### Processes
+
+#### List Processes
+```
+GET /api/v1/processes
+```
+
+Response:
+```json
+[
+  {
+    "id": 1,
+    "name": "api-server",
+    "status": "online",
+    "pid": 1234,
+    "cpu": 12.5,
+    "memory": 134217728,
+    "restarts": 0,
+    "uptime": 86400,
+    "execMode": "cluster",
+    "instances": 4
+  }
+]
+```
+
+#### Get Process
+```
+GET /api/v1/processes/:id
+```
+
+#### Start Process
+```
+POST /api/v1/processes
+Content-Type: application/json
+
+{
+  "name": "my-app",
+  "script": "./app.js",
+  "instances": 2,
+  "exec_mode": "cluster"
+}
+```
+
+#### Restart Process
+```
+PUT /api/v1/processes/:id/restart
+```
+
+#### Stop Process
+```
+PUT /api/v1/processes/:id/stop
+```
+
+#### Delete Process
+```
+DELETE /api/v1/processes/:id
+```
+
+### Metrics
+
+#### All Process Metrics
+```
+GET /api/v1/metrics
+```
+
+#### Process Metrics
+```
+GET /api/v1/metrics/:processId
+GET /api/v1/metrics/:processId?start=2024-01-01&end=2024-01-02
+```
+
+#### System Metrics
+```
+GET /api/v1/system
+```
+
+### Logs
+
+#### Process Logs
+```
+GET /api/v1/logs/:processId?lines=100
+```
+
+#### All Logs
+```
+GET /api/v1/logs?lines=50
+```
+
+### Health
+```
+GET /api/v1/health
+```
+
+## WebSocket Endpoints
+
+### Log Streaming
+```
+ws://localhost:9615/ws/logs
+```
+
+Receives real-time log entries as JSON.
+
+### Metrics Streaming
+```
+ws://localhost:9615/ws/metrics
+```
+
+Receives real-time process and system metrics.
+
+### Event Streaming
+```
+ws://localhost:9615/ws/events
+```
+
+Receives all process events (start, stop, crash, etc.).

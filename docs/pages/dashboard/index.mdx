@@ -1,0 +1,69 @@
+# Web Dashboard
+
+NovaPM includes a beautiful, real-time web dashboard for monitoring and managing your processes.
+
+## Launch
+
+```bash
+nova dashboard --open
+```
+
+Default URL: `http://localhost:9615`
+
+## Pages
+
+### Overview Dashboard
+The main page shows:
+- System stats cards (CPU, Memory, Process Count, Uptime)
+- Process list with real-time metrics
+- Recent log entries
+- AI insights feed
+
+### Processes
+Full process management:
+- Sortable, filterable process table
+- Start new processes
+- Restart, stop, delete with one click
+- Detailed process view with metrics charts
+
+### Logs
+Real-time log viewer:
+- Filter by process, level, search text
+- Auto-scroll with toggle
+- Color-coded log levels
+- Timestamp display toggle
+
+### Metrics
+System and process monitoring:
+- CPU usage charts
+- Memory usage charts
+- Load average
+- Per-process metric selector
+- Time range selection
+
+### Servers
+Multi-server view:
+- Connected server cards
+- Server health indicators
+- Per-server resource usage
+
+### Settings
+Dashboard configuration:
+- Theme selection (dark/light)
+- Connection settings
+- About/version information
+
+## Configuration
+
+```js
+dashboard: {
+  enabled: true,
+  port: 9615,
+  host: '0.0.0.0',
+  auth: {
+    type: 'basic',
+    username: 'admin',
+    password: 'your-password',
+  },
+}
+```

@@ -1,0 +1,13 @@
+node_modules/
+dist/
+.next/
+.turbo/
+*.tsbuildinfo
+coverage/
+.novapm/
+.env
+.env.local
+.env.*.local
+*.log
+.DS_Store
+package-lock.json

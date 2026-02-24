@@ -1,0 +1,26 @@
+{
+  "name": "@novapm/docs",
+  "version": "0.1.0",
+  "private": true,
+  "description": "NovaPM documentation site",
+  "license": "MIT",
+  "author": "Sitharaj Seenviasan",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sitharaj88/novapm.git",
+    "directory": "docs"
+  },
+  "homepage": "https://novapm.dev",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start"
+  },
+  "dependencies": {
+    "next": "^14.2.0",
+    "nextra": "^2.13.0",
+    "nextra-theme-docs": "^2.13.0",
+    "react": "^18.3.0",
+    "react-dom": "^18.3.0"
+  }
+}
