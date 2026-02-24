@@ -41,7 +41,6 @@
     "pidusage": "^3.0.2"
   },
   "devDependencies": {
-    "@novapm/dashboard": "workspace:*",
     "@types/better-sqlite3": "^7.6.12",
     "@types/node": "^20",
     "@types/pidusage": "^2.0.5",
