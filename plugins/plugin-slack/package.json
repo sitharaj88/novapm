@@ -1,6 +1,6 @@
 {
   "name": "@novapm/plugin-slack",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Slack notification plugin for NovaPM",
   "license": "MIT",
   "author": "Sitharaj Seenviasan",
@@ -10,6 +10,7 @@
     "directory": "plugins/plugin-slack"
   },
   "homepage": "https://novapm.dev",
+  "files": ["dist"],
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",

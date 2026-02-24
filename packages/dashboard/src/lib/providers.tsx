@@ -6,6 +6,7 @@ import { useAppStore } from './store';
 
 export function Providers({ children }: { children: ReactNode }) {
   const refreshInterval = useAppStore((s) => s.refreshInterval);
+  const theme = useAppStore((s) => s.theme);
 
   const queryClient = useMemo(
     () =>
@@ -19,6 +20,16 @@ export function Providers({ children }: { children: ReactNode }) {
       }),
     [],
   );
+
+  // Sync theme class to <html> element
+  useEffect(() => {
+    const root = document.documentElement;
+    if (theme === 'dark') {
+      root.classList.add('dark');
+    } else {
+      root.classList.remove('dark');
+    }
+  }, [theme]);
 
   useEffect(() => {
     queryClient.setDefaultOptions({

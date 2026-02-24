@@ -20,6 +20,12 @@ function saveSetting(key: string, value: unknown): void {
   }
 }
 
+export interface Toast {
+  id: string;
+  type: 'success' | 'error' | 'info';
+  message: string;
+}
+
 interface AppState {
   // Processes
   processes: ProcessInfo[];
@@ -41,6 +47,15 @@ interface AppState {
   sidebarCollapsed: boolean;
   toggleSidebar: () => void;
   setSidebarCollapsed: (collapsed: boolean) => void;
+
+  // Mobile sidebar
+  mobileSidebarOpen: boolean;
+  setMobileSidebarOpen: (open: boolean) => void;
+
+  // Toasts
+  toasts: Toast[];
+  addToast: (type: Toast['type'], message: string) => void;
+  removeToast: (id: string) => void;
 
   // Settings (persisted)
   refreshInterval: number;
@@ -75,6 +90,22 @@ export const useAppStore = create<AppState>((set) => ({
   sidebarCollapsed: false,
   toggleSidebar: () => set((state) => ({ sidebarCollapsed: !state.sidebarCollapsed })),
   setSidebarCollapsed: (sidebarCollapsed) => set({ sidebarCollapsed }),
+
+  // Mobile sidebar
+  mobileSidebarOpen: false,
+  setMobileSidebarOpen: (mobileSidebarOpen) => set({ mobileSidebarOpen }),
+
+  // Toasts
+  toasts: [],
+  addToast: (type, message) => {
+    const id = `toast-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
+    set((state) => ({ toasts: [...state.toasts, { id, type, message }] }));
+    setTimeout(() => {
+      set((state) => ({ toasts: state.toasts.filter((t) => t.id !== id) }));
+    }, 4000);
+  },
+  removeToast: (id) =>
+    set((state) => ({ toasts: state.toasts.filter((t) => t.id !== id) })),
 
   // Settings
   refreshInterval: loadSetting<number>('refreshInterval', 10),

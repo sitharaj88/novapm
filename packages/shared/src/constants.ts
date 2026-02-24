@@ -33,7 +33,7 @@ export const DEFAULT_HEALTH_CHECK_INTERVAL = '30s';
 export const DEFAULT_HEALTH_CHECK_TIMEOUT = '5s';
 export const DEFAULT_HEALTH_CHECK_RETRIES = 3;
 export const IPC_PROTOCOL_VERSION = 1;
-export const NOVA_VERSION = '1.0.0';
+export const NOVA_VERSION = '1.0.1';
 
 export const DEFAULT_INTERPRETER = 'node';
 export const DEFAULT_EXEC_MODE = 'fork' as const;

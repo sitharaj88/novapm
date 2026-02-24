@@ -11,7 +11,6 @@ import {
   Search,
   ArrowDownToLine,
   Clock,
-  Filter,
 } from 'lucide-react';
 import { useAppStore } from '@/lib/store';
 
@@ -58,31 +57,30 @@ export default function LogsPage() {
   });
 
   return (
-    <div className="flex h-[calc(100vh-3rem)] flex-col space-y-4">
+    <div className="flex h-[calc(100vh-3rem)] flex-col space-y-3 md:h-[calc(100vh-3rem)] md:space-y-4">
       <Header
         title="Logs"
         description="Real-time log stream from all processes"
       />
 
       {/* Filters */}
-      <div className="flex flex-wrap items-center gap-3">
-        <div className="relative flex-1 min-w-[200px]">
+      <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:gap-3">
+        <div className="relative flex-1 min-w-0 sm:min-w-[200px]">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-nova-text-muted" />
           <input
             type="text"
             placeholder="Search logs..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full rounded-lg border border-nova-border bg-nova-card py-2 pl-10 pr-4 text-sm text-nova-text-primary placeholder:text-nova-text-muted focus:border-nova-purple focus:outline-none focus:ring-1 focus:ring-nova-purple"
+            className="w-full rounded-xl border border-nova-border bg-nova-card py-2 pl-10 pr-4 text-sm text-nova-text-primary placeholder:text-nova-text-muted focus:border-nova-purple focus:outline-none focus:ring-1 focus:ring-nova-purple"
           />
         </div>
 
         <div className="flex items-center gap-2">
-          <Filter className="h-4 w-4 text-nova-text-muted" />
           <select
             value={selectedProcess}
             onChange={(e) => setSelectedProcess(e.target.value)}
-            className="rounded-lg border border-nova-border bg-nova-card px-3 py-2 text-sm text-nova-text-primary focus:border-nova-purple focus:outline-none focus:ring-1 focus:ring-nova-purple"
+            className="flex-1 rounded-xl border border-nova-border bg-nova-card px-3 py-2 text-xs sm:text-sm text-nova-text-primary focus:border-nova-purple focus:outline-none focus:ring-1 focus:ring-nova-purple"
           >
             <option value="all">All Processes</option>
             {processes.map((p) => (
@@ -95,7 +93,7 @@ export default function LogsPage() {
           <select
             value={selectedLevel}
             onChange={(e) => setSelectedLevel(e.target.value)}
-            className="rounded-lg border border-nova-border bg-nova-card px-3 py-2 text-sm text-nova-text-primary focus:border-nova-purple focus:outline-none focus:ring-1 focus:ring-nova-purple"
+            className="flex-1 rounded-xl border border-nova-border bg-nova-card px-3 py-2 text-xs sm:text-sm text-nova-text-primary focus:border-nova-purple focus:outline-none focus:ring-1 focus:ring-nova-purple"
           >
             <option value="all">All Levels</option>
             <option value="info">Info</option>
@@ -109,63 +107,65 @@ export default function LogsPage() {
           <button
             onClick={() => setAutoScroll(!autoScroll)}
             className={cn(
-              'flex items-center gap-1.5 rounded-lg border px-3 py-2 text-sm font-medium transition-colors',
+              'flex items-center gap-1.5 rounded-xl border px-3 py-2 text-xs sm:text-sm font-medium transition-colors',
               autoScroll
                 ? 'border-nova-purple/30 bg-nova-purple/10 text-nova-purple'
                 : 'border-nova-border text-nova-text-secondary hover:bg-nova-elevated'
             )}
           >
             <ArrowDownToLine className="h-3.5 w-3.5" />
-            Auto-scroll
+            <span className="hidden sm:inline">Auto-scroll</span>
+            <span className="sm:hidden">Scroll</span>
           </button>
 
           <button
             onClick={() => setShowTimestamps(!showTimestamps)}
             className={cn(
-              'flex items-center gap-1.5 rounded-lg border px-3 py-2 text-sm font-medium transition-colors',
+              'flex items-center gap-1.5 rounded-xl border px-3 py-2 text-xs sm:text-sm font-medium transition-colors',
               showTimestamps
                 ? 'border-nova-cyan/30 bg-nova-cyan/10 text-nova-cyan'
                 : 'border-nova-border text-nova-text-secondary hover:bg-nova-elevated'
             )}
           >
             <Clock className="h-3.5 w-3.5" />
-            Timestamps
+            <span className="hidden sm:inline">Timestamps</span>
+            <span className="sm:hidden">Time</span>
           </button>
         </div>
       </div>
 
       {/* Log Stream */}
-      <div className="flex-1 overflow-auto rounded-xl border border-nova-border bg-nova-bg font-mono text-sm">
+      <div className="flex-1 overflow-auto rounded-xl border border-nova-border bg-nova-bg font-mono text-xs sm:text-sm">
         {filteredLogs.length === 0 ? (
           <div className="flex h-full items-center justify-center text-nova-text-muted">
             {search ? 'No logs match your search' : 'No logs available'}
           </div>
         ) : (
-          <div className="p-3 space-y-0.5">
+          <div className="p-2 sm:p-3 space-y-0.5">
             {filteredLogs.map((log: LogEntry, i: number) => (
               <div
                 key={log.id || i}
-                className="flex items-start gap-2 rounded px-2 py-1 hover:bg-nova-card/50"
+                className="flex items-start gap-1.5 sm:gap-2 rounded px-1.5 sm:px-2 py-1 hover:bg-nova-card/50"
               >
                 {showTimestamps && (
-                  <span className="shrink-0 text-xs text-nova-text-muted">
+                  <span className="hidden shrink-0 text-[10px] sm:text-xs text-nova-text-muted sm:block">
                     {format(new Date(log.timestamp), 'HH:mm:ss.SSS')}
                   </span>
                 )}
                 <span
                   className={cn(
-                    'shrink-0 rounded px-1.5 py-0.5 text-xs font-medium uppercase',
+                    'shrink-0 rounded px-1 sm:px-1.5 py-0.5 text-[10px] sm:text-xs font-medium uppercase',
                     levelBadgeColors[log.level] || levelBadgeColors.info
                   )}
                 >
                   {log.level}
                 </span>
-                <span className="shrink-0 text-xs text-nova-purple">
+                <span className="shrink-0 text-[10px] sm:text-xs text-nova-purple">
                   [{log.processName}]
                 </span>
                 <span
                   className={cn(
-                    'break-all',
+                    'break-all text-[11px] sm:text-sm',
                     levelColors[log.level] || 'text-nova-text-primary'
                   )}
                 >

@@ -1,5 +1,9 @@
+import { existsSync } from 'node:fs';
+import { join, dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import Fastify, { type FastifyInstance } from 'fastify';
 import cors from '@fastify/cors';
+import fastifyStatic from '@fastify/static';
 import websocket from '@fastify/websocket';
 import { DEFAULT_DASHBOARD_PORT, getLogger } from '@novapm/shared';
 import type { ProcessManager } from '../process/ProcessManager.js';
@@ -117,6 +121,24 @@ export class HTTPServer {
         this.eventBus.offAny(handler);
       });
     });
+
+    // Serve dashboard static files if available
+    const __dirname = dirname(fileURLToPath(import.meta.url));
+    const dashboardDir = join(__dirname, '..', 'dashboard');
+    if (existsSync(dashboardDir)) {
+      await this.app.register(fastifyStatic, {
+        root: dashboardDir,
+        prefix: '/',
+        wildcard: false,
+      });
+
+      // SPA fallback: serve index.html for client-side routes
+      this.app.setNotFoundHandler((_request, reply) => {
+        return reply.sendFile('index.html', dashboardDir);
+      });
+
+      logger.info({ path: dashboardDir }, 'Dashboard static files registered');
+    }
 
     await this.app.listen({ port: this.port, host: this.host });
     logger.info({ port: this.port, host: this.host }, 'HTTP server listening');

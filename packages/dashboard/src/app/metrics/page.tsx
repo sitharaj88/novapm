@@ -104,20 +104,20 @@ export default function MetricsPage() {
   }, []);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 md:space-y-6">
       <Header
         title="Metrics"
         description="System and process performance monitoring"
         actions={
-          <div className="flex items-center gap-1 rounded-lg border border-nova-border bg-nova-card p-1">
+          <div className="flex items-center gap-0.5 rounded-xl border border-nova-border bg-nova-card p-1">
             {timeRanges.map((tr) => (
               <button
                 key={tr.value}
                 onClick={() => setTimeRange(tr.value)}
                 className={cn(
-                  'rounded-md px-3 py-1.5 text-xs font-medium transition-colors',
+                  'rounded-lg px-2.5 py-1.5 text-xs font-medium transition-all sm:px-3',
                   timeRange === tr.value
-                    ? 'bg-nova-purple text-white'
+                    ? 'bg-nova-purple text-white shadow-sm'
                     : 'text-nova-text-secondary hover:text-nova-text-primary'
                 )}
               >
@@ -130,35 +130,35 @@ export default function MetricsPage() {
 
       {/* System Overview */}
       <div>
-        <h2 className="mb-4 text-lg font-semibold text-nova-text-primary">
+        <h2 className="mb-3 text-base font-semibold text-nova-text-primary md:mb-4 md:text-lg">
           System Overview
         </h2>
 
         {/* System info cards */}
         {systemMetrics && (
-          <div className="mb-4 grid grid-cols-1 gap-3 sm:grid-cols-3">
-            <div className="rounded-lg border border-nova-border bg-nova-card p-4">
-              <p className="text-xs font-medium text-nova-text-muted">Platform</p>
-              <p className="mt-1 text-sm font-medium text-nova-text-primary">
+          <div className="mb-4 grid grid-cols-3 gap-2 sm:gap-3">
+            <div className="rounded-xl border border-nova-border bg-nova-card p-3 sm:p-4">
+              <p className="text-[10px] sm:text-xs font-medium text-nova-text-muted">Platform</p>
+              <p className="mt-1 text-xs sm:text-sm font-medium text-nova-text-primary capitalize">
                 {systemMetrics.platform}
               </p>
             </div>
-            <div className="rounded-lg border border-nova-border bg-nova-card p-4">
-              <p className="text-xs font-medium text-nova-text-muted">Hostname</p>
-              <p className="mt-1 text-sm font-medium text-nova-text-primary">
+            <div className="rounded-xl border border-nova-border bg-nova-card p-3 sm:p-4">
+              <p className="text-[10px] sm:text-xs font-medium text-nova-text-muted">Hostname</p>
+              <p className="mt-1 truncate text-xs sm:text-sm font-medium text-nova-text-primary">
                 {systemMetrics.hostname}
               </p>
             </div>
-            <div className="rounded-lg border border-nova-border bg-nova-card p-4">
-              <p className="text-xs font-medium text-nova-text-muted">CPU Model</p>
-              <p className="mt-1 text-sm font-medium text-nova-text-primary">
+            <div className="rounded-xl border border-nova-border bg-nova-card p-3 sm:p-4">
+              <p className="text-[10px] sm:text-xs font-medium text-nova-text-muted">CPU</p>
+              <p className="mt-1 truncate text-xs sm:text-sm font-medium text-nova-text-primary">
                 {systemMetrics.cpu.model}
               </p>
             </div>
           </div>
         )}
 
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+        <div className="grid grid-cols-1 gap-4 md:gap-6 lg:grid-cols-2">
           <MetricChart
             title="CPU Usage"
             data={systemChartData}
@@ -173,7 +173,7 @@ export default function MetricsPage() {
           />
         </div>
 
-        <div className="mt-6">
+        <div className="mt-4 md:mt-6">
           <MetricChart
             title="Load Average"
             data={systemChartData}
@@ -186,14 +186,14 @@ export default function MetricsPage() {
 
       {/* Per-Process Metrics */}
       <div>
-        <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-nova-text-primary">
+        <div className="mb-3 flex flex-col gap-2 sm:mb-4 sm:flex-row sm:items-center sm:justify-between">
+          <h2 className="text-base font-semibold text-nova-text-primary md:text-lg">
             Per-Process Metrics
           </h2>
           <select
             value={selectedProcess}
             onChange={handleProcessChange}
-            className="rounded-lg border border-nova-border bg-nova-card px-3 py-2 text-sm text-nova-text-primary focus:border-nova-purple focus:outline-none focus:ring-1 focus:ring-nova-purple"
+            className="rounded-xl border border-nova-border bg-nova-card px-3 py-2 text-xs sm:text-sm text-nova-text-primary focus:border-nova-purple focus:outline-none focus:ring-1 focus:ring-nova-purple"
           >
             <option value="all">All Processes</option>
             {processes.map((p) => (
@@ -205,7 +205,7 @@ export default function MetricsPage() {
         </div>
 
         {processChartData.length > 0 ? (
-          <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+          <div className="grid grid-cols-1 gap-4 md:gap-6 lg:grid-cols-2">
             <MetricChart
               title="Process CPU"
               data={processChartData}

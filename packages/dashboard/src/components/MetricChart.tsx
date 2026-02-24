@@ -1,6 +1,7 @@
 'use client';
 
 import { cn } from '@/lib/utils';
+import { useAppStore } from '@/lib/store';
 import {
   AreaChart,
   Area,
@@ -25,6 +26,23 @@ interface MetricChartProps {
   height?: number;
 }
 
+const chartTheme = {
+  dark: {
+    grid: '#1e2030',
+    tick: '#454866',
+    tooltipBg: '#181923',
+    tooltipBorder: '#1e2030',
+    tooltipText: '#e2e4f0',
+  },
+  light: {
+    grid: '#e2e5ef',
+    tick: '#6b7280',
+    tooltipBg: '#ffffff',
+    tooltipBorder: '#d0d5e3',
+    tooltipText: '#111827',
+  },
+};
+
 export function MetricChart({
   title,
   data,
@@ -34,6 +52,9 @@ export function MetricChart({
   className,
   height = 250,
 }: MetricChartProps) {
+  const theme = useAppStore((s) => s.theme);
+  const colors = chartTheme[theme];
+
   return (
     <div
       className={cn(
@@ -61,26 +82,26 @@ export function MetricChart({
               </linearGradient>
             ))}
           </defs>
-          <CartesianGrid strokeDasharray="3 3" stroke="#1e2030" vertical={false} />
+          <CartesianGrid strokeDasharray="3 3" stroke={colors.grid} vertical={false} />
           <XAxis
             dataKey={xAxisKey}
             axisLine={false}
             tickLine={false}
-            tick={{ fontSize: 11, fill: '#454866' }}
+            tick={{ fontSize: 11, fill: colors.tick }}
           />
           <YAxis
             axisLine={false}
             tickLine={false}
-            tick={{ fontSize: 11, fill: '#454866' }}
+            tick={{ fontSize: 11, fill: colors.tick }}
             tickFormatter={yAxisFormatter}
           />
           <Tooltip
             contentStyle={{
-              backgroundColor: '#181923',
-              border: '1px solid #1e2030',
+              backgroundColor: colors.tooltipBg,
+              border: `1px solid ${colors.tooltipBorder}`,
               borderRadius: '8px',
               fontSize: '12px',
-              color: '#e2e4f0',
+              color: colors.tooltipText,
             }}
           />
           {dataKeys.map((dk) => (

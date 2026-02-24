@@ -67,7 +67,7 @@ export function StatsCard({
   return (
     <div
       className={cn(
-        'rounded-xl border border-nova-border bg-nova-card p-5 transition-all hover:border-nova-elevated',
+        'rounded-xl border bg-nova-card p-5 transition-all hover:border-nova-text-muted/30',
         colors.border,
         className
       )}

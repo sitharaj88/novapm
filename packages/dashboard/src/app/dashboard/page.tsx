@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/lib/api';
 import { Header } from '@/components/Header';
@@ -7,12 +8,16 @@ import { StatsCard } from '@/components/StatsCard';
 import { ProcessTable } from '@/components/ProcessTable';
 import { MetricChart } from '@/components/MetricChart';
 import { LogViewer } from '@/components/LogViewer';
+import { ConfirmDialog } from '@/components/ConfirmDialog';
+import { useAppStore } from '@/lib/store';
 import { Server, Cpu, MemoryStick, Clock } from 'lucide-react';
 import { formatBytes, formatUptime } from '@/lib/utils';
 import { useWebSocket, useSystemMetricsBuffer } from '@/lib/useWebSocket';
 
 export default function DashboardPage() {
   const queryClient = useQueryClient();
+  const addToast = useAppStore((s) => s.addToast);
+  const [deleteTarget, setDeleteTarget] = useState<{ id: string; name: string } | null>(null);
 
   const { data: processes = [] } = useQuery({
     queryKey: ['processes'],
@@ -39,17 +44,29 @@ export default function DashboardPage() {
 
   const restartMutation = useMutation({
     mutationFn: (id: string) => api.restartProcess(id),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['processes'] }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['processes'] });
+      addToast('success', 'Process restarted');
+    },
+    onError: (err: Error) => addToast('error', `Restart failed: ${err.message}`),
   });
 
   const stopMutation = useMutation({
     mutationFn: (id: string) => api.stopProcess(id),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['processes'] }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['processes'] });
+      addToast('success', 'Process stopped');
+    },
+    onError: (err: Error) => addToast('error', `Stop failed: ${err.message}`),
   });
 
   const deleteMutation = useMutation({
     mutationFn: (id: string) => api.deleteProcess(id),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['processes'] }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['processes'] });
+      addToast('success', 'Process deleted');
+    },
+    onError: (err: Error) => addToast('error', `Delete failed: ${err.message}`),
   });
 
   const onlineCount = processes.filter((p) => p.status === 'online').length;
@@ -125,7 +142,10 @@ export default function DashboardPage() {
           processes={processes}
           onRestart={(id) => restartMutation.mutate(id)}
           onStop={(id) => stopMutation.mutate(id)}
-          onDelete={(id) => deleteMutation.mutate(id)}
+          onDelete={(id) => {
+            const proc = processes.find((p) => p.id === id);
+            setDeleteTarget({ id, name: proc?.name || id });
+          }}
         />
       </div>
 
@@ -148,6 +168,17 @@ export default function DashboardPage() {
           <LogViewer logs={logs} maxHeight="280px" autoScroll />
         </div>
       </div>
+
+      <ConfirmDialog
+        open={deleteTarget !== null}
+        title="Delete Process"
+        message={`Are you sure you want to delete "${deleteTarget?.name}"? This will stop the process if it's running and remove it permanently.`}
+        confirmLabel="Delete"
+        onConfirm={() => {
+          if (deleteTarget) deleteMutation.mutate(deleteTarget.id);
+        }}
+        onCancel={() => setDeleteTarget(null)}
+      />
     </div>
   );
 }

@@ -6,7 +6,7 @@ import type { ServerInfo } from '@/lib/api';
 import { Header } from '@/components/Header';
 import { cn } from '@/lib/utils';
 import { formatUptime } from '@/lib/utils';
-import { Server, Wifi, WifiOff, AlertTriangle, MonitorX, RefreshCw } from 'lucide-react';
+import { Network, Wifi, WifiOff, AlertTriangle, MonitorX, RefreshCw } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 
 type ServerStatus = 'online' | 'offline' | 'degraded';
@@ -67,7 +67,7 @@ function ServerCard({ server }: { server: ServerInfo }) {
   return (
     <div
       className={cn(
-        'rounded-xl border bg-nova-card p-5 transition-all hover:border-nova-elevated',
+        'rounded-xl border bg-nova-card p-5 transition-all hover:border-nova-text-muted/30',
         server.status === 'online'
           ? 'border-nova-border'
           : server.status === 'degraded'
@@ -79,7 +79,7 @@ function ServerCard({ server }: { server: ServerInfo }) {
       <div className="mb-4 flex items-start justify-between">
         <div className="flex items-center gap-3">
           <div className="rounded-lg bg-nova-elevated p-2">
-            <Server className="h-5 w-5 text-nova-text-secondary" />
+            <Network className="h-5 w-5 text-nova-text-secondary" />
           </div>
           <div>
             <h3 className="text-sm font-semibold text-nova-text-primary">
@@ -168,7 +168,7 @@ export default function ServersPage() {
   });
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 md:space-y-6">
       <Header
         title="Servers"
         description="Multi-server monitoring and management"

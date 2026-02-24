@@ -1,4 +1,8 @@
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:9615';
+function getBaseUrl(): string {
+  if (process.env.NEXT_PUBLIC_API_URL) return process.env.NEXT_PUBLIC_API_URL;
+  if (typeof window !== 'undefined') return window.location.origin;
+  return '';
+}
 
 export interface ProcessInfo {
   id: string;
@@ -105,16 +109,19 @@ export interface HealthStatus {
 }
 
 export function getWebSocketUrl(path: string): string {
-  const wsBase = BASE_URL.replace(/^http/, 'ws');
+  const base = getBaseUrl();
+  const wsBase = base.replace(/^http/, 'ws');
   return `${wsBase}${path}`;
 }
 
 async function request<T>(path: string, options?: RequestInit): Promise<T> {
-  const url = `${BASE_URL}${path}`;
+  const url = `${getBaseUrl()}${path}`;
+  const headers: Record<string, string> = {};
+  if (options?.body) {
+    headers['Content-Type'] = 'application/json';
+  }
   const res = await fetch(url, {
-    headers: {
-      'Content-Type': 'application/json',
-    },
+    headers,
     ...options,
   });
   if (!res.ok) {
@@ -123,31 +130,90 @@ async function request<T>(path: string, options?: RequestInit): Promise<T> {
   return res.json() as Promise<T>;
 }
 
+// Transform raw API process response to dashboard ProcessInfo format.
+// API returns: id (number), metrics (object|null with cpu/memory), startedAt (Date), createdAt (Date)
+// Dashboard expects: id (string), cpu/memory/uptime at top level, createdAt (ISO string)
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function transformProcess(raw: any): ProcessInfo {
+  const metrics = raw.metrics || {};
+  const startedAt = raw.startedAt ? new Date(raw.startedAt).getTime() : 0;
+  const uptime =
+    startedAt && raw.status === 'online'
+      ? Math.floor((Date.now() - startedAt) / 1000)
+      : 0;
+
+  return {
+    id: String(raw.id),
+    name: raw.name || '',
+    status: raw.status || 'stopped',
+    pid: raw.pid ?? null,
+    cpu: metrics.cpu ?? 0,
+    memory: metrics.memory ?? 0,
+    restarts: raw.restarts ?? 0,
+    uptime,
+    script: raw.script || '',
+    cwd: raw.cwd || '',
+    createdAt: raw.createdAt
+      ? new Date(raw.createdAt).toISOString()
+      : '',
+  };
+}
+
+// Transform raw API log entry to dashboard LogEntry format.
+// API returns: processId (number), stream ('stdout'|'stderr'), no id/level
+// Dashboard expects: processId (string), level ('info'|'error'|...), id (string)
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function transformLog(raw: any, index: number): LogEntry {
+  let level: LogEntry['level'] = 'info';
+  if (raw.level) {
+    level = raw.level;
+  } else if (raw.stream === 'stderr') {
+    level = 'error';
+  }
+
+  return {
+    id: raw.id ? String(raw.id) : `log-${Date.now()}-${index}`,
+    processId: String(raw.processId),
+    processName: raw.processName || '',
+    timestamp: raw.timestamp
+      ? new Date(raw.timestamp).toISOString()
+      : new Date().toISOString(),
+    level,
+    message: raw.message || '',
+  };
+}
+
 export const api = {
   // Processes
-  getProcesses(): Promise<ProcessInfo[]> {
-    return request<ProcessInfo[]>('/api/v1/processes');
+  async getProcesses(): Promise<ProcessInfo[]> {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const raw = await request<any[]>('/api/v1/processes');
+    return raw.map(transformProcess);
   },
 
-  getProcess(id: string): Promise<ProcessInfo> {
-    return request<ProcessInfo>(`/api/v1/processes/${id}`);
+  async getProcess(id: string): Promise<ProcessInfo> {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const raw = await request<any>(`/api/v1/processes/${id}`);
+    return transformProcess(raw);
   },
 
-  startProcess(config: ProcessStartConfig): Promise<ProcessInfo> {
-    return request<ProcessInfo>('/api/v1/processes', {
+  async startProcess(config: ProcessStartConfig): Promise<ProcessInfo> {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const raw = await request<any>('/api/v1/processes', {
       method: 'POST',
       body: JSON.stringify(config),
     });
+    return transformProcess(raw);
   },
 
-  restartProcess(id: string): Promise<ProcessInfo> {
-    return request<ProcessInfo>(`/api/v1/processes/${id}/restart`, {
+  restartProcess(id: string): Promise<{ status: string }> {
+    return request<{ status: string }>(`/api/v1/processes/${id}/restart`, {
       method: 'PUT',
     });
   },
 
-  stopProcess(id: string): Promise<ProcessInfo> {
-    return request<ProcessInfo>(`/api/v1/processes/${id}/stop`, {
+  stopProcess(id: string): Promise<{ status: string }> {
+    return request<{ status: string }>(`/api/v1/processes/${id}/stop`, {
       method: 'PUT',
     });
   },
@@ -171,24 +237,60 @@ export const api = {
     return request<MetricRow[]>(`/api/v1/metrics/${processId}${qs ? `?${qs}` : ''}`);
   },
 
-  getSystemMetrics(): Promise<SystemMetrics> {
-    return request<SystemMetrics>('/api/v1/system');
+  async getSystemMetrics(): Promise<SystemMetrics> {
+    // Transform flat API response to nested format expected by dashboard.
+    // API returns: cpuUsage, cpuCount, cpuModel, memoryTotal, memoryUsed, memoryFree, etc.
+    // Dashboard expects: cpu.usage, cpu.cores, cpu.model, memory.total, memory.used, etc.
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const raw = await request<any>('/api/v1/system');
+    const memTotal = (raw.memoryTotal as number) || 0;
+    const memUsed = (raw.memoryUsed as number) || 0;
+    const memFree = (raw.memoryFree as number) || 0;
+    return {
+      cpu: {
+        usage: (raw.cpuUsage as number) || 0,
+        cores: (raw.cpuCount as number) || 0,
+        model: (raw.cpuModel as string) || '',
+      },
+      memory: {
+        total: memTotal,
+        used: memUsed,
+        free: memFree,
+        percentage: memTotal > 0 ? (memUsed / memTotal) * 100 : 0,
+      },
+      uptime: (raw.uptime as number) || 0,
+      loadAvg: (raw.loadAvg as number[]) || [],
+      platform: (raw.platform as string) || '',
+      hostname: (raw.hostname as string) || '',
+    };
   },
 
   // Logs
-  getLogs(processId?: string, lines?: number): Promise<LogEntry[]> {
+  async getLogs(processId?: string, lines?: number): Promise<LogEntry[]> {
     const params = new URLSearchParams();
     if (lines) params.set('lines', String(lines));
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    let raw: any[];
     if (processId) {
-      return request<LogEntry[]>(`/api/v1/logs/${processId}?${params.toString()}`);
+      raw = await request<unknown[]>(`/api/v1/logs/${processId}?${params.toString()}`);
+    } else {
+      raw = await request<unknown[]>(`/api/v1/logs?${params.toString()}`);
     }
-    return request<LogEntry[]>(`/api/v1/logs?${params.toString()}`);
+    return raw.map(transformLog);
   },
 
   // Health
-  getHealth(): Promise<HealthStatus> {
-    return request<HealthStatus>('/api/v1/health');
+  async getHealth(): Promise<HealthStatus> {
+    // API returns { status, timestamp }. Fill in defaults for fields the dashboard expects.
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const raw = await request<any>('/api/v1/health');
+    return {
+      status: raw.status || 'ok',
+      version: raw.version || '1.0.0',
+      uptime: raw.uptime ?? 0,
+      processCount: raw.processCount ?? 0,
+    };
   },
 
   // Servers

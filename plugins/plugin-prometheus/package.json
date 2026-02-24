@@ -1,6 +1,6 @@
 {
   "name": "@novapm/plugin-prometheus",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Prometheus metrics exporter plugin for NovaPM",
   "license": "MIT",
   "author": "Sitharaj Seenviasan",
@@ -10,6 +10,7 @@
     "directory": "plugins/plugin-prometheus"
   },
   "homepage": "https://novapm.dev",
+  "files": ["dist"],
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",

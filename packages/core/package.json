@@ -1,6 +1,6 @@
 {
   "name": "@novapm/core",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Core daemon and process management for NovaPM",
   "license": "MIT",
   "author": "Sitharaj Seenviasan",
@@ -10,6 +10,7 @@
     "directory": "packages/core"
   },
   "homepage": "https://novapm.dev",
+  "files": ["dist"],
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -20,7 +21,7 @@
     }
   },
   "scripts": {
-    "build": "tsc",
+    "build": "tsc && rm -rf dist/dashboard && cp -r ../dashboard/out dist/dashboard",
     "dev": "tsc --watch",
     "clean": "rm -rf dist",
     "typecheck": "tsc --noEmit",
@@ -29,6 +30,7 @@
   },
   "dependencies": {
     "@fastify/cors": "^10.0.0",
+    "@fastify/static": "^8.0.0",
     "@fastify/websocket": "^11.0.0",
     "@novapm/shared": "workspace:*",
     "better-sqlite3": "^11.7.0",

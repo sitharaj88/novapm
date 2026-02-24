@@ -1,6 +1,6 @@
 @import "tailwindcss";
 
-@theme inline {
+@theme {
   --color-nova-bg: #0a0b0f;
   --color-nova-card: #12131a;
   --color-nova-elevated: #181923;
@@ -15,8 +15,8 @@
   --color-nova-yellow: #ffd43b;
   --color-nova-blue: #3b82f6;
 
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
 }
 
 :root {
@@ -24,9 +24,30 @@
   --bg-card: #12131a;
 }
 
+/* Light mode color overrides */
+html:not(.dark) {
+  --color-nova-bg: #f1f3f9;
+  --color-nova-card: #ffffff;
+  --color-nova-elevated: #e8ebf4;
+  --color-nova-border: #d0d5e3;
+  --color-nova-text-primary: #111827;
+  --color-nova-text-secondary: #4b5563;
+  --color-nova-text-muted: #9ca3af;
+  --color-nova-purple: #5b4cdb;
+  --color-nova-cyan: #0891b2;
+  --color-nova-green: #059669;
+  --color-nova-red: #dc2626;
+  --color-nova-yellow: #d97706;
+  --color-nova-blue: #2563eb;
+  --bg-primary: #f1f3f9;
+  --bg-card: #ffffff;
+}
+
 body {
   background: var(--bg-primary);
-  color: #e2e4f0;
+  color: var(--color-nova-text-primary, #e2e4f0);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 /* Scrollbar styling */
@@ -35,12 +56,41 @@ body {
   height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #12131a;
+  background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: #1e2030;
+  background: var(--color-nova-border);
   border-radius: 3px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #2a2d45;
+  background: var(--color-nova-text-muted);
+}
+
+/* Selection */
+::selection {
+  background: rgba(108, 92, 231, 0.3);
+}
+html:not(.dark) ::selection {
+  background: rgba(91, 76, 219, 0.2);
+  color: #111827;
+}
+
+/* Focus ring */
+*:focus-visible {
+  outline: 2px solid rgba(108, 92, 231, 0.5);
+  outline-offset: 2px;
+}
+
+/* Custom select arrow */
+select {
+  -webkit-appearance: none;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23454866' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+  background-position: right 0.5rem center;
+  background-repeat: no-repeat;
+  background-size: 1.5em 1.5em;
+  padding-right: 2.5rem;
+}
+html:not(.dark) select {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%234b5563' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
 }

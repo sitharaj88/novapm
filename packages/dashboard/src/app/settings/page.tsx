@@ -1,15 +1,24 @@
 'use client';
 
+import { useQuery } from '@tanstack/react-query';
+import { api } from '@/lib/api';
 import { Header } from '@/components/Header';
 import { useAppStore } from '@/lib/store';
 import { cn } from '@/lib/utils';
-import { Moon, Sun, Globe, Info, Zap } from 'lucide-react';
+import { Moon, Sun, Globe, Info, CheckCircle, XCircle, RefreshCw } from 'lucide-react';
 
 export default function SettingsPage() {
   const { theme, toggleTheme, refreshInterval, setRefreshInterval, logViewerLines, setLogViewerLines } = useAppStore();
 
+  const { data: health, isLoading: healthLoading, isError: healthError, refetch: refetchHealth } = useQuery({
+    queryKey: ['health'],
+    queryFn: () => api.getHealth(),
+    retry: false,
+    refetchInterval: 30000,
+  });
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 md:space-y-6">
       <Header
         title="Settings"
         description="Configure your NovaPM dashboard"
@@ -17,17 +26,17 @@ export default function SettingsPage() {
 
       {/* Dashboard Configuration */}
       <section className="rounded-xl border border-nova-border bg-nova-card">
-        <div className="border-b border-nova-border px-6 py-4">
-          <h2 className="text-base font-semibold text-nova-text-primary">
+        <div className="border-b border-nova-border px-4 py-3 sm:px-6 sm:py-4">
+          <h2 className="text-sm font-semibold text-nova-text-primary sm:text-base">
             Dashboard Configuration
           </h2>
-          <p className="mt-0.5 text-sm text-nova-text-secondary">
+          <p className="mt-0.5 text-xs text-nova-text-secondary sm:text-sm">
             Customize the dashboard appearance and behavior
           </p>
         </div>
         <div className="divide-y divide-nova-border">
           {/* Theme Toggle */}
-          <div className="flex items-center justify-between px-6 py-4">
+          <div className="flex items-center justify-between px-4 py-3 sm:px-6 sm:py-4">
             <div className="flex items-center gap-3">
               {theme === 'dark' ? (
                 <Moon className="h-5 w-5 text-nova-purple" />
@@ -47,12 +56,12 @@ export default function SettingsPage() {
               onClick={toggleTheme}
               className={cn(
                 'relative h-6 w-11 rounded-full transition-colors',
-                theme === 'dark' ? 'bg-nova-purple' : 'bg-nova-border'
+                theme === 'dark' ? 'bg-nova-purple' : 'bg-nova-text-muted'
               )}
             >
               <span
                 className={cn(
-                  'absolute top-0.5 h-5 w-5 rounded-full bg-white transition-transform',
+                  'absolute top-0.5 h-5 w-5 rounded-full bg-white shadow-sm transition-transform',
                   theme === 'dark' ? 'left-[22px]' : 'left-0.5'
                 )}
               />
@@ -60,7 +69,7 @@ export default function SettingsPage() {
           </div>
 
           {/* Auto-refresh interval */}
-          <div className="flex items-center justify-between px-6 py-4">
+          <div className="flex items-center justify-between px-4 py-3 sm:px-6 sm:py-4">
             <div>
               <p className="text-sm font-medium text-nova-text-primary">
                 Auto-refresh Interval
@@ -83,7 +92,7 @@ export default function SettingsPage() {
           </div>
 
           {/* Log retention */}
-          <div className="flex items-center justify-between px-6 py-4">
+          <div className="flex items-center justify-between px-4 py-3 sm:px-6 sm:py-4">
             <div>
               <p className="text-sm font-medium text-nova-text-primary">
                 Log Viewer Lines
@@ -108,16 +117,64 @@ export default function SettingsPage() {
 
       {/* API Connection */}
       <section className="rounded-xl border border-nova-border bg-nova-card">
-        <div className="border-b border-nova-border px-6 py-4">
-          <h2 className="text-base font-semibold text-nova-text-primary">
-            API Connection
-          </h2>
-          <p className="mt-0.5 text-sm text-nova-text-secondary">
-            Connection details for the NovaPM core daemon
-          </p>
+        <div className="border-b border-nova-border px-4 py-3 sm:px-6 sm:py-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-sm font-semibold text-nova-text-primary sm:text-base">
+                API Connection
+              </h2>
+              <p className="mt-0.5 text-xs text-nova-text-secondary sm:text-sm">
+                Connection details for the NovaPM core daemon
+              </p>
+            </div>
+            <button
+              onClick={() => refetchHealth()}
+              className="rounded-lg p-1.5 text-nova-text-muted transition-colors hover:bg-nova-elevated hover:text-nova-text-primary"
+              title="Check connection"
+            >
+              <RefreshCw className="h-4 w-4" />
+            </button>
+          </div>
         </div>
         <div className="divide-y divide-nova-border">
-          <div className="flex items-center justify-between px-6 py-4">
+          {/* Connection Status */}
+          <div className="flex items-center justify-between px-4 py-3 sm:px-6 sm:py-4">
+            <div className="flex items-center gap-3">
+              {healthLoading ? (
+                <RefreshCw className="h-5 w-5 animate-spin text-nova-text-muted" />
+              ) : healthError ? (
+                <XCircle className="h-5 w-5 text-nova-red" />
+              ) : (
+                <CheckCircle className="h-5 w-5 text-nova-green" />
+              )}
+              <div>
+                <p className="text-sm font-medium text-nova-text-primary">
+                  Connection Status
+                </p>
+                <p className="text-xs text-nova-text-secondary">
+                  {healthLoading
+                    ? 'Checking connection...'
+                    : healthError
+                      ? 'Unable to reach the NovaPM daemon'
+                      : `Connected — ${health?.processCount ?? 0} process${(health?.processCount ?? 0) !== 1 ? 'es' : ''} managed`}
+                </p>
+              </div>
+            </div>
+            <span
+              className={cn(
+                'inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-medium',
+                healthLoading
+                  ? 'border-nova-border bg-nova-elevated text-nova-text-muted'
+                  : healthError
+                    ? 'border-nova-red/20 bg-nova-red/10 text-nova-red'
+                    : 'border-nova-green/20 bg-nova-green/10 text-nova-green'
+              )}
+            >
+              {healthLoading ? 'Checking' : healthError ? 'Disconnected' : 'Connected'}
+            </span>
+          </div>
+
+          <div className="flex items-center justify-between px-4 py-3 sm:px-6 sm:py-4">
             <div className="flex items-center gap-3">
               <Globe className="h-5 w-5 text-nova-cyan" />
               <div>
@@ -129,12 +186,12 @@ export default function SettingsPage() {
                 </p>
               </div>
             </div>
-            <code className="rounded-md bg-nova-bg px-3 py-1.5 text-sm text-nova-cyan">
-              http://localhost:9615
+            <code className="rounded-md bg-nova-bg px-2 py-1 text-xs text-nova-cyan sm:px-3 sm:py-1.5 sm:text-sm">
+              {typeof window !== 'undefined' ? window.location.origin : 'http://localhost:9615'}
             </code>
           </div>
 
-          <div className="flex items-center justify-between px-6 py-4">
+          <div className="flex items-center justify-between px-4 py-3 sm:px-6 sm:py-4">
             <div>
               <p className="text-sm font-medium text-nova-text-primary">
                 WebSocket Endpoints
@@ -166,15 +223,17 @@ export default function SettingsPage() {
 
       {/* About */}
       <section className="rounded-xl border border-nova-border bg-nova-card">
-        <div className="border-b border-nova-border px-6 py-4">
-          <h2 className="text-base font-semibold text-nova-text-primary">
+        <div className="border-b border-nova-border px-4 py-3 sm:px-6 sm:py-4">
+          <h2 className="text-sm font-semibold text-nova-text-primary sm:text-base">
             About
           </h2>
         </div>
-        <div className="px-6 py-4">
+        <div className="px-4 py-3 sm:px-6 sm:py-4">
           <div className="flex items-center gap-4">
-            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-nova-purple">
-              <Zap className="h-6 w-6 text-white" />
+            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-nova-purple to-nova-cyan shadow-lg shadow-nova-purple/20">
+              <svg viewBox="0 0 24 24" fill="none" className="h-6 w-6 text-white" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
+              </svg>
             </div>
             <div>
               <h3 className="text-base font-bold text-nova-text-primary">
@@ -189,7 +248,7 @@ export default function SettingsPage() {
             <div>
               <p className="text-xs text-nova-text-muted">Dashboard Version</p>
               <p className="mt-0.5 text-sm font-medium text-nova-text-primary">
-                0.1.0
+                1.0.0
               </p>
             </div>
             <div>

@@ -1,6 +1,6 @@
 {
   "name": "@novapm/plugin-github-deploy",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "GitHub webhook deployment plugin for NovaPM",
   "license": "MIT",
   "author": "Sitharaj Seenviasan",
@@ -10,6 +10,7 @@
     "directory": "plugins/plugin-github-deploy"
   },
   "homepage": "https://novapm.dev",
+  "files": ["dist"],
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
