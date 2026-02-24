@@ -1,6 +1,6 @@
 {
   "name": "@novapm/cli",
-  "version": "0.2.0",
+  "version": "1.0.0",
   "description": "CLI interface for NovaPM",
   "license": "MIT",
   "author": "Sitharaj Seenviasan",
@@ -14,7 +14,7 @@
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "bin": {
-    "nova": "./dist/index.js"
+    "nova-pm": "./dist/index.js"
   },
   "exports": {
     ".": {

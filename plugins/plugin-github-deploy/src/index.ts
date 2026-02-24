@@ -78,7 +78,7 @@ interface DeploymentRecord {
  */
 class GitHubDeployPlugin implements NovaPMPlugin {
   readonly name = 'plugin-github-deploy';
-  readonly version = '0.2.0';
+  readonly version = '1.0.0';
   readonly description = 'GitHub webhook deployment for NovaPM';
   readonly author = 'NovaPM Team';
 

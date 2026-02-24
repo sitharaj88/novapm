@@ -2,12 +2,12 @@
 
 ## Process Management
 
-### `nova start`
+### `nova-pm start`
 
 Start a process or all processes from a config file.
 
 ```bash
-nova start <script|config> [options]
+nova-pm start <script|config> [options]
 ```
 
 **Options:**
@@ -26,52 +26,52 @@ nova start <script|config> [options]
 | `--node-args <args>` | Node.js arguments | — |
 | `--cwd <dir>` | Working directory | Current dir |
 
-### `nova stop`
+### `nova-pm stop`
 
 ```bash
-nova stop <name|id|all> [--force]
+nova-pm stop <name|id|all> [--force]
 ```
 
-### `nova restart`
+### `nova-pm restart`
 
 ```bash
-nova restart <name|id|all>
+nova-pm restart <name|id|all>
 ```
 
-### `nova delete`
+### `nova-pm delete`
 
 ```bash
-nova delete <name|id|all>
+nova-pm delete <name|id|all>
 ```
 
-### `nova scale`
+### `nova-pm scale`
 
 ```bash
-nova scale <name|id> <instances>
+nova-pm scale <name|id> <instances>
 # Examples:
-nova scale api 8      # Set to 8 instances
-nova scale api +2     # Add 2 instances
-nova scale api -1     # Remove 1 instance
+nova-pm scale api 8      # Set to 8 instances
+nova-pm scale api +2     # Add 2 instances
+nova-pm scale api -1     # Remove 1 instance
 ```
 
 ## Information
 
-### `nova list`
+### `nova-pm list`
 
 ```bash
-nova list [--json]
+nova-pm list [--json]
 ```
 
-### `nova info`
+### `nova-pm info`
 
 ```bash
-nova info <name|id> [--json]
+nova-pm info <name|id> [--json]
 ```
 
-### `nova logs`
+### `nova-pm logs`
 
 ```bash
-nova logs [name|id] [options]
+nova-pm logs [name|id] [options]
 ```
 
 | Flag | Description | Default |
@@ -80,33 +80,33 @@ nova logs [name|id] [options]
 | `-f, --follow` | Stream new logs | `false` |
 | `--json` | Output as JSON | `false` |
 
-### `nova monit`
+### `nova-pm monit`
 
 Real-time terminal monitoring dashboard.
 
 ```bash
-nova monit
+nova-pm monit
 ```
 
 ## System
 
-### `nova ping`
+### `nova-pm ping`
 Check if the daemon is running.
 
-### `nova save`
+### `nova-pm save`
 Save current process list for restoration.
 
-### `nova resurrect`
+### `nova-pm resurrect`
 Restore previously saved process list.
 
-### `nova startup`
+### `nova-pm startup`
 Generate OS startup script (systemd, launchd).
 
-### `nova dashboard`
+### `nova-pm dashboard`
 Open the web dashboard.
 
-### `nova init`
-Generate a `nova.config.js` file interactively.
+### `nova-pm init`
+Generate a `nova-pm.config.js` file interactively.
 
-### `nova doctor`
+### `nova-pm doctor`
 Diagnose NovaPM installation.

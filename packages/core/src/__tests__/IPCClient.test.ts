@@ -53,7 +53,7 @@ describe('IPCClient', () => {
     vi.clearAllMocks();
     existsSyncReturn = true;
     const { IPCClient } = await import('../ipc/IPCClient.js');
-    client = new IPCClient('/tmp/test-nova.sock');
+    client = new IPCClient('/tmp/test-nova-pm.sock');
   });
 
   afterEach(() => {
@@ -105,12 +105,12 @@ describe('IPCClient', () => {
       const response: IPCResponse = {
         jsonrpc: '2.0',
         id: sentRequest.id,
-        result: { version: '0.1.0', uptime: 100, pid: 1234 },
+        result: { version: '1.0.0', uptime: 100, pid: 1234 },
       };
       mockSocket.emit('data', JSON.stringify(response) + '\n');
 
       const result = await requestPromise;
-      expect(result).toEqual({ version: '0.1.0', uptime: 100, pid: 1234 });
+      expect(result).toEqual({ version: '1.0.0', uptime: 100, pid: 1234 });
     });
 
     it('should send request with params', async () => {
@@ -171,12 +171,12 @@ describe('IPCClient', () => {
       const response: IPCResponse = {
         jsonrpc: '2.0',
         id: sentRequest.id,
-        result: { version: '0.1.0' },
+        result: { version: '1.0.0' },
       };
       mockSocket.emit('data', JSON.stringify(response) + '\n');
 
       const result = await requestPromise;
-      expect(result).toEqual({ version: '0.1.0' });
+      expect(result).toEqual({ version: '1.0.0' });
     });
 
     it('should handle multiple concurrent requests', async () => {
@@ -195,12 +195,12 @@ describe('IPCClient', () => {
       const resp2: IPCResponse = {
         jsonrpc: '2.0',
         id: req2.id,
-        result: { version: '0.1.0' },
+        result: { version: '1.0.0' },
       };
       const resp1: IPCResponse = {
         jsonrpc: '2.0',
         id: req1.id,
-        result: { version: '0.1.0', uptime: 50, pid: 1234 },
+        result: { version: '1.0.0', uptime: 50, pid: 1234 },
       };
 
       mockSocket.emit('data', JSON.stringify(resp2) + '\n');
@@ -209,8 +209,8 @@ describe('IPCClient', () => {
       const result1 = await promise1;
       const result2 = await promise2;
 
-      expect(result1).toEqual({ version: '0.1.0', uptime: 50, pid: 1234 });
-      expect(result2).toEqual({ version: '0.1.0' });
+      expect(result1).toEqual({ version: '1.0.0', uptime: 50, pid: 1234 });
+      expect(result2).toEqual({ version: '1.0.0' });
     });
 
     it('should handle response split across multiple data chunks', async () => {

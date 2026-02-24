@@ -41,7 +41,7 @@ interface MetricValue {
  */
 class PrometheusPlugin implements NovaPMPlugin {
   readonly name = 'plugin-prometheus';
-  readonly version = '0.2.0';
+  readonly version = '1.0.0';
   readonly description = 'Prometheus metrics exporter for NovaPM';
   readonly author = 'NovaPM Team';
 

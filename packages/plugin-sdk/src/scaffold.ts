@@ -27,7 +27,7 @@ export async function generatePluginTemplate(name: string, outputDir: string): P
 function generatePackageJson(name: string): string {
   const pkg = {
     name: `novapm-plugin-${name}`,
-    version: '0.1.0',
+    version: '1.0.0',
     description: `NovaPM plugin: ${name}`,
     type: 'module',
     main: './dist/index.js',
@@ -80,7 +80,7 @@ import type { ProcessEvent, ProcessMetrics } from '@novapm/shared';
  */
 class ${capitalizeFirst(camelName)}Plugin implements NovaPMPlugin {
   readonly name = '${name}';
-  readonly version = '0.2.0';
+  readonly version = '1.0.0';
   readonly description = 'A NovaPM plugin';
 
   private context: PluginContext | null = null;

@@ -47,7 +47,7 @@ COPY --from=builder /build/dist ./dist
 COPY --from=builder /build/package.json ./
 
 # Copy the NovaPM config and application entry point
-COPY nova.config.js ./
+COPY nova-pm.config.js ./
 COPY app.js ./
 
 # Create log directory and set ownership
@@ -65,11 +65,11 @@ ENV PORT=3000
 
 # Health check - verify that the NovaPM daemon is alive
 HEALTHCHECK --interval=30s --timeout=5s --start-period=15s --retries=3 \
-  CMD nova ping || exit 1
+  CMD nova-pm ping || exit 1
 
 # Use tini as init to forward signals correctly to NovaPM
 ENTRYPOINT ["/sbin/tini", "--"]
 
-# Start all processes defined in nova.config.js (--no-daemon keeps the
+# Start all processes defined in nova-pm.config.js (--no-daemon keeps the
 # container alive; NovaPM runs in the foreground)
-CMD ["nova", "start", "nova.config.js", "--no-daemon"]
+CMD ["nova-pm", "start", "nova-pm.config.js", "--no-daemon"]

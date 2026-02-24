@@ -5,9 +5,9 @@ import { resolve } from 'node:path';
 
 export const initCommand = new Command('init')
   .option('--template <template>', 'Config template (basic, full)', 'basic')
-  .description('Generate a nova.config.js file')
+  .description('Generate a nova-pm.config.js file')
   .action(async (options) => {
-    const configPath = resolve('nova.config.js');
+    const configPath = resolve('nova-pm.config.js');
 
     if (existsSync(configPath)) {
       console.log(chalk.yellow(`\n  Config file already exists: ${configPath}\n`));
@@ -18,7 +18,7 @@ export const initCommand = new Command('init')
     writeFileSync(configPath, template);
 
     console.log(chalk.green(`\n  Created ${configPath}`));
-    console.log(chalk.gray(`  Edit it and run: nova start\n`));
+    console.log(chalk.gray(`  Edit it and run: nova-pm start\n`));
   });
 
 function basicTemplate(): string {

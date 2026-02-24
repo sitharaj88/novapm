@@ -51,58 +51,58 @@ pnpm add -g novapm
 
 ```bash
 # Start a process
-nova start app.js
+nova-pm start app.js
 
 # Start with options
-nova start server.js --name api --instances 4 --exec-mode cluster
+nova-pm start server.js --name api --instances 4 --exec-mode cluster
 
 # Start from config file
-nova start nova.config.js
+nova-pm start nova-pm.config.js
 
 # List all processes
-nova list
+nova-pm list
 
 # Monitor in real-time
-nova monit
+nova-pm monit
 
 # Open web dashboard
-nova dashboard --open
+nova-pm dashboard --open
 
 # View logs
-nova logs api --follow
+nova-pm logs api --follow
 
 # Stop a process
-nova stop api
+nova-pm stop api
 
 # Restart all processes
-nova restart all
+nova-pm restart all
 ```
 
 ## CLI Commands
 
 | Command | Description |
 |---------|-------------|
-| `nova start <script\|config>` | Start a process or processes from config |
-| `nova stop <name\|id\|all>` | Stop a process |
-| `nova restart <name\|id\|all>` | Restart a process |
-| `nova delete <name\|id\|all>` | Delete a process |
-| `nova list` | List all processes |
-| `nova info <name\|id>` | Detailed process information |
-| `nova logs [name\|id]` | View process logs |
-| `nova monit` | Real-time terminal monitoring |
-| `nova scale <name\|id> <n>` | Scale process instances |
-| `nova save` | Save current process list |
-| `nova resurrect` | Restore saved processes |
-| `nova startup [platform]` | Generate OS startup script |
-| `nova dashboard` | Open web dashboard |
-| `nova init` | Generate config file |
-| `nova doctor` | Diagnose installation |
-| `nova ping` | Check daemon status |
+| `nova-pm start <script\|config>` | Start a process or processes from config |
+| `nova-pm stop <name\|id\|all>` | Stop a process |
+| `nova-pm restart <name\|id\|all>` | Restart a process |
+| `nova-pm delete <name\|id\|all>` | Delete a process |
+| `nova-pm list` | List all processes |
+| `nova-pm info <name\|id>` | Detailed process information |
+| `nova-pm logs [name\|id]` | View process logs |
+| `nova-pm monit` | Real-time terminal monitoring |
+| `nova-pm scale <name\|id> <n>` | Scale process instances |
+| `nova-pm save` | Save current process list |
+| `nova-pm resurrect` | Restore saved processes |
+| `nova-pm startup [platform]` | Generate OS startup script |
+| `nova-pm dashboard` | Open web dashboard |
+| `nova-pm init` | Generate config file |
+| `nova-pm doctor` | Diagnose installation |
+| `nova-pm ping` | Check daemon status |
 
 ### Start Options
 
 ```bash
-nova start app.js \
+nova-pm start app.js \
   --name my-app \
   --instances 4 \
   --exec-mode cluster \
@@ -117,7 +117,7 @@ nova start app.js \
 
 ## Configuration
 
-Create a `nova.config.js` (or `.ts`, `.json`, `.yaml`) file:
+Create a `nova-pm.config.js` (or `.ts`, `.json`, `.yaml`) file:
 
 ```javascript
 export default {
@@ -182,7 +182,7 @@ export default {
 Launch the web dashboard:
 
 ```bash
-nova dashboard --open
+nova-pm dashboard --open
 ```
 
 The dashboard runs on `http://localhost:9615` and provides:
@@ -240,13 +240,13 @@ Connect to OpenAI, Anthropic, or local Ollama for:
 ### Install a Plugin
 
 ```bash
-nova plugin install @novapm/plugin-slack
+nova-pm plugin install @novapm/plugin-slack
 ```
 
 ### Create a Plugin
 
 ```bash
-nova plugin create my-plugin
+nova-pm plugin create my-plugin
 ```
 
 ## Multi-Server Management
@@ -255,11 +255,11 @@ Manage processes across multiple servers:
 
 ```bash
 # On each server, start the agent
-nova agent start --controller host:9616
+nova-pm agent start --controller host:9616
 
 # On the controller
-nova server list
-nova server status web-01
+nova-pm server list
+nova-pm server status web-01
 ```
 
 Supports deployment strategies:
@@ -316,7 +316,7 @@ NovaPM reads PM2 `ecosystem.config.js` files:
 
 ```bash
 # Use your existing PM2 config
-nova start ecosystem.config.js
+nova-pm start ecosystem.config.js
 ```
 
 ## Development

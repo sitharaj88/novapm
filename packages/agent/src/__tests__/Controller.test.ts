@@ -100,7 +100,7 @@ function makeServerInfo(overrides: Partial<ServerInfo> = {}): ServerInfo {
       arch: 'x64',
       cpuCount: 4,
       memoryTotal: 16_000_000_000,
-      novaVersion: '0.1.0',
+      novaVersion: '1.0.0',
     },
     processes: 5,
     cpuUsage: 25.5,

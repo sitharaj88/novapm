@@ -71,7 +71,7 @@ ExecStart=${process.execPath} ${process.argv[1]} resurrect
 ExecReload=${process.execPath} ${process.argv[1]} restart all
 ExecStop=${process.execPath} ${process.argv[1]} stop all
 Restart=on-failure
-PIDFile=%h/.novapm/nova.pid
+PIDFile=%h/.novapm/nova-pm.pid
 
 [Install]
 WantedBy=multi-user.target`;

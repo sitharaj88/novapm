@@ -17,7 +17,7 @@ export const resurrectCommand = new Command('resurrect')
       const savePath = join(NOVA_HOME, 'dump.json');
 
       if (!existsSync(savePath)) {
-        spinner.fail(chalk.yellow('No saved process list found. Run "nova save" first.'));
+        spinner.fail(chalk.yellow('No saved process list found. Run "nova-pm save" first.'));
         return;
       }
 

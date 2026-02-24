@@ -9,7 +9,7 @@ This guide covers strategies for optimizing NovaPM and your managed processes fo
 Cluster mode runs multiple instances of your application, distributing load across CPU cores. NovaPM uses Node.js cluster module under the hood with configurable load balancing.
 
 ```typescript
-// nova.config.ts
+// nova-pm.config.ts
 export default {
   apps: [{
     name: "api",
@@ -43,10 +43,10 @@ On Linux, `round_robin` typically provides more even distribution. On macOS and 
 
 ### Graceful Reload in Cluster Mode
 
-Use `nova reload` instead of `nova restart` for zero-downtime deployments. NovaPM restarts instances one at a time, waiting for each to become ready before proceeding:
+Use `nova-pm reload` instead of `nova-pm restart` for zero-downtime deployments. NovaPM restarts instances one at a time, waiting for each to become ready before proceeding:
 
 ```bash
-nova reload api
+nova-pm reload api
 ```
 
 Configure the reload behavior:
@@ -96,7 +96,7 @@ Use load testing to find the optimal number:
 ```bash
 # Test with different instance counts
 for i in 1 2 4 8; do
-  nova scale api $i
+  nova-pm scale api $i
   sleep 5  # Wait for stabilization
   wrk -t4 -c100 -d30s http://localhost:3000/
 done
@@ -125,7 +125,7 @@ Set `max_memory_restart` below your server's available memory divided by the num
 **Monitor memory usage over time:**
 
 ```bash
-nova metrics api --metric memory --period 24h
+nova-pm metrics api --metric memory --period 24h
 ```
 
 ## Log Rotation for Disk Space
@@ -208,7 +208,7 @@ export default {
 **Manually trigger compaction if the database has grown large:**
 
 ```bash
-nova db compact
+nova-pm db compact
 ```
 
 ## Node.js Flags for Production
@@ -292,4 +292,4 @@ On single-core machines or containers with limited CPU, consider disabling the A
 - [ ] Configure database downsampling and retention
 - [ ] Pass appropriate Node.js flags for production
 - [ ] Adjust AI engine frequency based on available resources
-- [ ] Use `nova reload` for zero-downtime deploys in cluster mode
+- [ ] Use `nova-pm reload` for zero-downtime deploys in cluster mode

@@ -30,7 +30,7 @@ interface ContainerInfo {
  */
 class DockerPlugin implements NovaPMPlugin {
   readonly name = 'plugin-docker';
-  readonly version = '0.2.0';
+  readonly version = '1.0.0';
   readonly description = 'Docker container awareness for NovaPM';
   readonly author = 'NovaPM Team';
 

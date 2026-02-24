@@ -55,19 +55,19 @@ vi.mock('../ui/Table.js', () => ({
 
 // Mock @novapm/shared
 vi.mock('@novapm/shared', () => ({
-  NOVA_VERSION: '0.1.0',
+  NOVA_VERSION: '1.0.0',
   NOVA_HOME: '/tmp/.novapm',
-  NOVA_SOCK_FILE: '/tmp/.novapm/nova.sock',
-  NOVA_DB_FILE: '/tmp/.novapm/nova.db',
-  NOVA_PID_FILE: '/tmp/.novapm/nova.pid',
+  NOVA_SOCK_FILE: '/tmp/.novapm/nova-pm.sock',
+  NOVA_DB_FILE: '/tmp/.novapm/nova-pm.db',
+  NOVA_PID_FILE: '/tmp/.novapm/nova-pm.pid',
   NOVA_LOG_DIR: '/tmp/.novapm/logs',
   DEFAULT_DASHBOARD_PORT: 9615,
   NOVA_CONFIG_FILES: [
-    'nova.config.ts',
-    'nova.config.js',
-    'nova.config.json',
-    'nova.config.yaml',
-    'nova.config.yml',
+    'nova-pm.config.ts',
+    'nova-pm.config.js',
+    'nova-pm.config.json',
+    'nova-pm.config.yaml',
+    'nova-pm.config.yml',
     'ecosystem.config.ts',
     'ecosystem.config.js',
     'ecosystem.config.cjs',

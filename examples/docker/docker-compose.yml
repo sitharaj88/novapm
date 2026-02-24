@@ -22,7 +22,7 @@ services:
       # NOVA_DASHBOARD_PORT: "9615"
       # NOVA_LOG_LEVEL: "info"
     healthcheck:
-      test: ["CMD", "nova", "ping"]
+      test: ["CMD", "nova-pm", "ping"]
       interval: 30s
       timeout: 5s
       start_period: 15s

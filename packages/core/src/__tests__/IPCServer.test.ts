@@ -172,7 +172,7 @@ describe('IPCServer', () => {
       logAggregator as never,
       metricsCollector as never,
       systemMetrics as never,
-      '/tmp/test-nova.sock',
+      '/tmp/test-nova-pm.sock',
     );
   });
 
@@ -187,7 +187,7 @@ describe('IPCServer', () => {
       const mockServer = getMockServer();
 
       expect(mockServer.listening).toBe(true);
-      expect(mockServer.sockPath).toBe('/tmp/test-nova.sock');
+      expect(mockServer.sockPath).toBe('/tmp/test-nova-pm.sock');
     });
 
     it('should stop and close all connections', async () => {
@@ -257,7 +257,7 @@ describe('IPCServer', () => {
       simulateClientMessage(socket, request);
       const response = await getResponse(socket);
 
-      expect(response.result).toEqual({ version: '0.1.0' });
+      expect(response.result).toEqual({ version: '1.0.0' });
     });
 
     it('should handle daemon.stop requests', async () => {

@@ -157,7 +157,7 @@ describe('ProcessNotRunningError', () => {
 describe('DaemonNotRunningError', () => {
   it('should create an error with a helpful message', () => {
     const error = new DaemonNotRunningError();
-    expect(error.message).toBe('NovaPM daemon is not running. Start it with: nova start <app>');
+    expect(error.message).toBe('NovaPM daemon is not running. Start it with: nova-pm start <app>');
     expect(error.code).toBe('DAEMON_NOT_RUNNING');
     expect(error.name).toBe('DaemonNotRunningError');
   });
@@ -170,7 +170,7 @@ describe('DaemonNotRunningError', () => {
 
   it('should include actionable instructions in the message', () => {
     const error = new DaemonNotRunningError();
-    expect(error.message).toContain('nova start');
+    expect(error.message).toContain('nova-pm start');
   });
 
   it('should require no constructor arguments', () => {
@@ -270,9 +270,9 @@ describe('IPCConnectionError', () => {
   });
 
   it('should accept descriptive connection error messages', () => {
-    const error = new IPCConnectionError('ECONNREFUSED: Could not connect to /tmp/nova.sock');
+    const error = new IPCConnectionError('ECONNREFUSED: Could not connect to /tmp/nova-pm.sock');
     expect(error.message).toContain('ECONNREFUSED');
-    expect(error.message).toContain('nova.sock');
+    expect(error.message).toContain('nova-pm.sock');
   });
 });
 

@@ -3,13 +3,13 @@
 ## Start Your First Process
 
 ```bash
-nova start app.js --name my-app
+nova-pm start app.js --name my-app
 ```
 
 ## View Running Processes
 
 ```bash
-nova list
+nova-pm list
 ```
 
 Output:
@@ -23,7 +23,7 @@ Output:
 
 ## Use a Config File
 
-Create `nova.config.js`:
+Create `nova-pm.config.js`:
 
 ```js
 export default {
@@ -40,33 +40,33 @@ export default {
 Then start all apps:
 
 ```bash
-nova start nova.config.js
+nova-pm start nova-pm.config.js
 ```
 
 ## Monitor in Real-Time
 
 ```bash
-nova monit
+nova-pm monit
 ```
 
 ## Open Web Dashboard
 
 ```bash
-nova dashboard --open
+nova-pm dashboard --open
 ```
 
 ## View Logs
 
 ```bash
-nova logs my-app --follow
+nova-pm logs my-app --follow
 ```
 
 ## Save and Restore
 
 ```bash
 # Save current process list
-nova save
+nova-pm save
 
 # After reboot, restore
-nova resurrect
+nova-pm resurrect
 ```

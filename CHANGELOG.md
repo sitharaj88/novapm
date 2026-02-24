@@ -5,7 +5,7 @@ All notable changes to the NovaPM project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.2.0] - 2026-02-24
+## [1.0.0] - 2026-02-24
 
 ### Added
 
@@ -53,7 +53,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **@novapm/agent**: `DeploymentManager` for coordinated rolling deployments across server fleet
 
 #### Testing
-- Added **1,543 tests** across **47 test files** covering all 12 testable packages
+- **1,543 tests** across **47 test files** covering all 12 testable packages
 - Test coverage includes: unit tests, edge cases, error handling, and integration scenarios
 - CI pipeline with build (13/13), lint (13/13), typecheck (15/15), and test validation
 
@@ -64,15 +64,3 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - GitHub Actions CI/CD pipeline with security scanning
 - Docker example with multi-stage build
 - Contributing guide and EditorConfig
-
-### Fixed
-
-- **Critical: `nova stop` auto-restart race condition** - Process would immediately restart after `nova stop` because `handleProcessExit` checked container status after it was overwritten. Fixed by capturing `wasIntentionallyStopped` flag before status update.
-- **`nova stop` not removing process from list** - Stopped processes remained visible in `nova list` with stale data. Fixed by removing processes from in-memory map after stopping.
-
-## [0.1.0] - 2026-02-23
-
-### Added
-
-- Initial project scaffolding with monorepo structure
-- Basic package stubs for all planned packages

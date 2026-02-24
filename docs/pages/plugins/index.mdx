@@ -51,7 +51,7 @@ plugins: [{
   options: {
     secret: process.env.GITHUB_WEBHOOK_SECRET,
     branch: 'main',
-    command: 'git pull && pnpm install && nova restart all',
+    command: 'git pull && pnpm install && nova-pm restart all',
   },
 }]
 ```
@@ -62,7 +62,7 @@ Email notifications for critical events.
 ## Creating a Plugin
 
 ```bash
-nova plugin create my-custom-plugin
+nova-pm plugin create my-custom-plugin
 ```
 
 This generates a plugin template with:

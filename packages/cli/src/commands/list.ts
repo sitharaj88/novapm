@@ -18,7 +18,9 @@ export const listCommand = new Command('list')
       }
 
       if (!processes || (processes as unknown[]).length === 0) {
-        console.log(chalk.gray('\n  No processes running. Start one with: nova start <script>\n'));
+        console.log(
+          chalk.gray('\n  No processes running. Start one with: nova-pm start <script>\n'),
+        );
         return;
       }
 

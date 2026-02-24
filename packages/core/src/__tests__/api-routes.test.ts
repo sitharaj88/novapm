@@ -706,7 +706,7 @@ describe('Server Routes', () => {
         memoryUsage: 65,
         processCount: 3,
         uptime: 86400,
-        version: '0.1.0',
+        version: '1.0.0',
         processes: [{ id: 1, name: 'app', status: 'online', cpu: 10, memory: 50000 }],
         metadata: { region: 'us-east' },
       });

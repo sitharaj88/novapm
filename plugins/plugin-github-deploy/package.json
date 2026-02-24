@@ -1,6 +1,6 @@
 {
   "name": "@novapm/plugin-github-deploy",
-  "version": "0.2.0",
+  "version": "1.0.0",
   "description": "GitHub webhook deployment plugin for NovaPM",
   "license": "MIT",
   "author": "Sitharaj Seenviasan",

@@ -60,7 +60,7 @@ const SEVERITY_COLORS: Record<string, string> = {
  */
 class SlackPlugin implements NovaPMPlugin {
   readonly name = 'plugin-slack';
-  readonly version = '0.2.0';
+  readonly version = '1.0.0';
   readonly description = 'Slack notification plugin for NovaPM';
   readonly author = 'NovaPM Team';
 

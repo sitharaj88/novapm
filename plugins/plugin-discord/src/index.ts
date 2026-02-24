@@ -62,7 +62,7 @@ const SEVERITY_COLORS: Record<string, number> = {
  */
 class DiscordPlugin implements NovaPMPlugin {
   readonly name = 'plugin-discord';
-  readonly version = '0.2.0';
+  readonly version = '1.0.0';
   readonly description = 'Discord notification plugin for NovaPM';
   readonly author = 'NovaPM Team';
 

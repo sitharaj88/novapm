@@ -72,7 +72,7 @@ vi.mock('@novapm/shared', () => ({
     error: vi.fn(),
     debug: vi.fn(),
   }),
-  NOVA_VERSION: '0.1.0-test',
+  NOVA_VERSION: '1.0.0-test',
   DEFAULT_AGENT_PORT: 9616,
 }));
 

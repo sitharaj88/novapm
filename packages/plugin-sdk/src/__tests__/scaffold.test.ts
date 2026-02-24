@@ -108,9 +108,9 @@ describe('generatePluginTemplate', () => {
       expect(pkg.name).toBe('novapm-plugin-my-plugin');
     });
 
-    it('should set version to 0.1.0', async () => {
+    it('should set version to 1.0.0', async () => {
       const pkg = await getGeneratedPackageJson('my-plugin');
-      expect(pkg.version).toBe('0.1.0');
+      expect(pkg.version).toBe('1.0.0');
     });
 
     it('should include the plugin name in the description', async () => {
@@ -229,7 +229,7 @@ describe('generatePluginTemplate', () => {
 
     it('should set the plugin version', async () => {
       const source = await getGeneratedSource('my-plugin');
-      expect(source).toContain("readonly version = '0.2.0'");
+      expect(source).toContain("readonly version = '1.0.0'");
     });
 
     it('should include an onInit hook', async () => {

@@ -31,7 +31,7 @@ export class ProcessNotRunningError extends NovaError {
 
 export class DaemonNotRunningError extends NovaError {
   constructor() {
-    super('NovaPM daemon is not running. Start it with: nova start <app>', 'DAEMON_NOT_RUNNING');
+    super('NovaPM daemon is not running. Start it with: nova-pm start <app>', 'DAEMON_NOT_RUNNING');
     this.name = 'DaemonNotRunningError';
   }
 }

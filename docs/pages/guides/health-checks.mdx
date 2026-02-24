@@ -17,7 +17,7 @@ NovaPM supports three types of health checks:
 HTTP health checks send a GET request to a specified endpoint and consider the check successful if the response status code is in the 2xx range.
 
 ```typescript
-// nova.config.ts
+// nova-pm.config.ts
 export default {
   apps: [{
     name: "web-api",
@@ -204,7 +204,7 @@ If a process fails health checks repeatedly after restarts, NovaPM respects the 
 **View health check status from the CLI:**
 
 ```bash
-nova health
+nova-pm health
 ```
 
 Output:
@@ -224,7 +224,7 @@ Output:
 A full configuration with multiple apps and different health check types:
 
 ```typescript
-// nova.config.ts
+// nova-pm.config.ts
 export default {
   apps: [
     {

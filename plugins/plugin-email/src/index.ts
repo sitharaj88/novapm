@@ -49,7 +49,7 @@ interface EmailPayload {
  */
 class EmailPlugin implements NovaPMPlugin {
   readonly name = 'plugin-email';
-  readonly version = '0.2.0';
+  readonly version = '1.0.0';
   readonly description = 'Email notification plugin for NovaPM';
   readonly author = 'NovaPM Team';
 

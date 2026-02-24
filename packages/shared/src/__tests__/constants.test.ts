@@ -60,20 +60,20 @@ describe('constants', () => {
   });
 
   describe('derived path constants', () => {
-    it('NOVA_PID_FILE should be nova.pid inside NOVA_HOME', () => {
-      expect(NOVA_PID_FILE).toBe(join(NOVA_HOME, 'nova.pid'));
+    it('NOVA_PID_FILE should be nova-pm.pid inside NOVA_HOME', () => {
+      expect(NOVA_PID_FILE).toBe(join(NOVA_HOME, 'nova-pm.pid'));
     });
 
-    it('NOVA_SOCK_FILE should be nova.sock inside NOVA_HOME', () => {
-      expect(NOVA_SOCK_FILE).toBe(join(NOVA_HOME, 'nova.sock'));
+    it('NOVA_SOCK_FILE should be nova-pm.sock inside NOVA_HOME', () => {
+      expect(NOVA_SOCK_FILE).toBe(join(NOVA_HOME, 'nova-pm.sock'));
     });
 
     it('NOVA_LOG_DIR should be logs directory inside NOVA_HOME', () => {
       expect(NOVA_LOG_DIR).toBe(join(NOVA_HOME, 'logs'));
     });
 
-    it('NOVA_DB_FILE should be nova.db inside NOVA_HOME', () => {
-      expect(NOVA_DB_FILE).toBe(join(NOVA_HOME, 'nova.db'));
+    it('NOVA_DB_FILE should be nova-pm.db inside NOVA_HOME', () => {
+      expect(NOVA_DB_FILE).toBe(join(NOVA_HOME, 'nova-pm.db'));
     });
 
     it('NOVA_PLUGIN_DIR should be plugins directory inside NOVA_HOME', () => {
@@ -81,12 +81,12 @@ describe('constants', () => {
     });
 
     it('NOVA_DAEMON_LOG should be inside NOVA_LOG_DIR', () => {
-      expect(NOVA_DAEMON_LOG).toBe(join(NOVA_LOG_DIR, 'nova-daemon.log'));
+      expect(NOVA_DAEMON_LOG).toBe(join(NOVA_LOG_DIR, 'nova-pm-daemon.log'));
       expect(NOVA_DAEMON_LOG.startsWith(NOVA_LOG_DIR)).toBe(true);
     });
 
     it('NOVA_DAEMON_ERROR_LOG should be inside NOVA_LOG_DIR', () => {
-      expect(NOVA_DAEMON_ERROR_LOG).toBe(join(NOVA_LOG_DIR, 'nova-daemon-error.log'));
+      expect(NOVA_DAEMON_ERROR_LOG).toBe(join(NOVA_LOG_DIR, 'nova-pm-daemon-error.log'));
       expect(NOVA_DAEMON_ERROR_LOG.startsWith(NOVA_LOG_DIR)).toBe(true);
     });
 
@@ -115,28 +115,28 @@ describe('constants', () => {
     });
 
     it('should include TypeScript config files', () => {
-      expect(NOVA_CONFIG_FILES).toContain('nova.config.ts');
+      expect(NOVA_CONFIG_FILES).toContain('nova-pm.config.ts');
       expect(NOVA_CONFIG_FILES).toContain('ecosystem.config.ts');
     });
 
     it('should include JavaScript config files', () => {
-      expect(NOVA_CONFIG_FILES).toContain('nova.config.js');
+      expect(NOVA_CONFIG_FILES).toContain('nova-pm.config.js');
       expect(NOVA_CONFIG_FILES).toContain('ecosystem.config.js');
       expect(NOVA_CONFIG_FILES).toContain('ecosystem.config.cjs');
     });
 
     it('should include JSON config files', () => {
-      expect(NOVA_CONFIG_FILES).toContain('nova.config.json');
+      expect(NOVA_CONFIG_FILES).toContain('nova-pm.config.json');
     });
 
     it('should include YAML config files', () => {
-      expect(NOVA_CONFIG_FILES).toContain('nova.config.yaml');
-      expect(NOVA_CONFIG_FILES).toContain('nova.config.yml');
+      expect(NOVA_CONFIG_FILES).toContain('nova-pm.config.yaml');
+      expect(NOVA_CONFIG_FILES).toContain('nova-pm.config.yml');
     });
 
     it('should have TypeScript configs listed before JavaScript configs (priority order)', () => {
-      const tsIndex = NOVA_CONFIG_FILES.indexOf('nova.config.ts');
-      const jsIndex = NOVA_CONFIG_FILES.indexOf('nova.config.js');
+      const tsIndex = NOVA_CONFIG_FILES.indexOf('nova-pm.config.ts');
+      const jsIndex = NOVA_CONFIG_FILES.indexOf('nova-pm.config.js');
       expect(tsIndex).toBeLessThan(jsIndex);
     });
 

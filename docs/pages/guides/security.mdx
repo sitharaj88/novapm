@@ -11,13 +11,13 @@ When running NovaPM in multi-server mode, agents communicate with the controller
 **Generate a secure token:**
 
 ```bash
-nova token generate
+nova-pm token generate
 ```
 
 **Configure the controller:**
 
 ```typescript
-// nova.config.ts
+// nova-pm.config.ts
 export default {
   controller: {
     port: 9800,
@@ -31,7 +31,7 @@ export default {
 **Configure agents to connect with the token:**
 
 ```bash
-nova agent connect <controller-host>:9800 --token $NOVA_AUTH_TOKEN
+nova-pm agent connect <controller-host>:9800 --token $NOVA_AUTH_TOKEN
 ```
 
 <Callout type="warning">
@@ -44,13 +44,13 @@ Rotate tokens periodically to limit the blast radius of a compromised credential
 
 ```bash
 # Generate a new token
-nova token generate --save
+nova-pm token generate --save
 
 # Update all agents (rolling update)
-nova agent update-token --new-token $NEW_NOVA_AUTH_TOKEN
+nova-pm agent update-token --new-token $NEW_NOVA_AUTH_TOKEN
 
 # Revoke the old token on the controller
-nova token revoke <old-token-id>
+nova-pm token revoke <old-token-id>
 ```
 
 ## TLS/SSL Setup
@@ -61,12 +61,12 @@ Encrypt all communication between agents and the controller using TLS.
 
 ```bash
 # Generate a self-signed certificate for development
-nova tls generate --out ~/.nova/certs/
+nova-pm tls generate --out ~/.novapm/certs/
 
 # This creates:
-#   ~/.nova/certs/server.key
-#   ~/.nova/certs/server.crt
-#   ~/.nova/certs/ca.crt
+#   ~/.novapm/certs/server.key
+#   ~/.novapm/certs/server.crt
+#   ~/.novapm/certs/ca.crt
 ```
 
 **Configure TLS on the controller:**
@@ -88,7 +88,7 @@ export default {
 **Configure TLS on agents:**
 
 ```bash
-nova agent connect <controller-host>:9800 \
+nova-pm agent connect <controller-host>:9800 \
   --tls \
   --ca /etc/nova/certs/ca.crt
 ```
@@ -140,8 +140,8 @@ NovaPM provides secure handling of environment variables passed to managed proce
 **Set secrets via the CLI (not stored in config files):**
 
 ```bash
-nova env set my-app DATABASE_URL "postgresql://user:pass@host/db" --secret
-nova env set my-app API_KEY "sk-abc123" --secret
+nova-pm env set my-app DATABASE_URL "postgresql://user:pass@host/db" --secret
+nova-pm env set my-app API_KEY "sk-abc123" --secret
 ```
 
 Secrets set with `--secret` are encrypted at rest in the NovaPM database and masked in log output and the dashboard.
@@ -158,13 +158,13 @@ export default {
       PORT: 3000,
       // Non-sensitive variables can be specified directly
     }
-    // Secrets set via `nova env set` are automatically injected
+    // Secrets set via `nova-pm env set` are automatically injected
   }]
 }
 ```
 
 <Callout type="warning">
-Avoid passing secrets through the `env` block in configuration files. Use `nova env set --secret` to keep sensitive values out of version control and encrypt them at rest.
+Avoid passing secrets through the `env` block in configuration files. Use `nova-pm env set --secret` to keep sensitive values out of version control and encrypt them at rest.
 </Callout>
 
 ## Network Security
@@ -209,24 +209,24 @@ ufw deny 9900
 
 ## File Permissions for NOVA_HOME
 
-The `NOVA_HOME` directory (default: `~/.nova`) contains sensitive data including process configurations, encrypted secrets, and logs.
+The `NOVA_HOME` directory (default: `~/.novapm`) contains sensitive data including process configurations, encrypted secrets, and logs.
 
 **Recommended permissions:**
 
 ```bash
 # Set restrictive permissions on NOVA_HOME
-chmod 700 ~/.nova
-chmod 700 ~/.nova/db
-chmod 600 ~/.nova/db/nova.db
-chmod 700 ~/.nova/logs
-chmod 700 ~/.nova/certs
-chmod 600 ~/.nova/certs/*.key
+chmod 700 ~/.novapm
+chmod 700 ~/.novapm/db
+chmod 600 ~/.novapm/db/nova-pm.db
+chmod 700 ~/.novapm/logs
+chmod 700 ~/.novapm/certs
+chmod 600 ~/.novapm/certs/*.key
 ```
 
 **Verify permissions:**
 
 ```bash
-nova doctor --check permissions
+nova-pm doctor --check permissions
 ```
 
 <Callout type="info">
@@ -287,6 +287,6 @@ Before deploying NovaPM to production, verify:
 - [ ] Daemon and API are bound to appropriate interfaces
 - [ ] Firewall rules restrict access to NovaPM ports
 - [ ] `NOVA_HOME` directory has restrictive file permissions
-- [ ] Secrets are stored with `nova env set --secret`, not in config files
+- [ ] Secrets are stored with `nova-pm env set --secret`, not in config files
 - [ ] WebSocket connections use WSS (TLS) in production
 - [ ] Log output does not contain sensitive data

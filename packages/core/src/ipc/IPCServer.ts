@@ -168,13 +168,13 @@ export class IPCServer {
   private registerBuiltinHandlers(): void {
     // Daemon methods
     this.handlers.set('daemon.ping', () => ({
-      version: '0.1.0',
+      version: '1.0.0',
       uptime: Math.floor((Date.now() - this.startTime.getTime()) / 1000),
       pid: process.pid,
     }));
 
     this.handlers.set('daemon.version', () => ({
-      version: '0.1.0',
+      version: '1.0.0',
     }));
 
     this.handlers.set('daemon.stop', async () => {

@@ -24,7 +24,7 @@ import { disconnect } from './utils/client.js';
 const program = new Command();
 
 program
-  .name('nova')
+  .name('nova-pm')
   .version(NOVA_VERSION, '-v, --version')
   .description(chalk.bold('NovaPM') + ' — Next-generation AI-powered process manager')
   .addCommand(startCommand)

@@ -11,19 +11,19 @@ If you see `Error: connect ECONNREFUSED` when running NovaPM commands, the daemo
 **Check if the daemon is running:**
 
 ```bash
-nova ping
+nova-pm ping
 ```
 
 **Force-restart the daemon:**
 
 ```bash
-nova daemon restart
+nova-pm daemon restart
 ```
 
 **If the daemon fails to start**, check the daemon logs:
 
 ```bash
-cat ~/.nova/logs/daemon.log
+cat ~/.novapm/logs/daemon.log
 ```
 
 <Callout type="info">
@@ -33,13 +33,13 @@ The daemon binds to `127.0.0.1:9876` by default. Ensure no other service is usin
 **Common causes:**
 
 - Another NovaPM instance is already running
-- The socket file at `~/.nova/nova.sock` is stale -- remove it and restart
+- The socket file at `~/.novapm/nova-pm.sock` is stale -- remove it and restart
 - Insufficient permissions to bind to the configured port
 
 ```bash
 # Remove stale socket and restart
-rm -f ~/.nova/nova.sock
-nova daemon start
+rm -f ~/.novapm/nova-pm.sock
+nova-pm daemon start
 ```
 
 ## Process Crashes and Restart Loops
@@ -49,29 +49,29 @@ When a process keeps crashing and restarting, NovaPM applies exponential backoff
 **Check the process logs:**
 
 ```bash
-nova logs <app-name> --lines 100
+nova-pm logs <app-name> --lines 100
 ```
 
 **Check restart count and status:**
 
 ```bash
-nova status
+nova-pm status
 ```
 
 **Stop the restart loop temporarily:**
 
 ```bash
-nova stop <app-name>
+nova-pm stop <app-name>
 ```
 
 <Callout type="warning">
-If a process has restarted more than 15 times in quick succession, NovaPM will mark it as `errored` and stop attempting restarts. Use `nova restart <app-name>` to reset the counter.
+If a process has restarted more than 15 times in quick succession, NovaPM will mark it as `errored` and stop attempting restarts. Use `nova-pm restart <app-name>` to reset the counter.
 </Callout>
 
 **Configure restart behavior in your config:**
 
 ```typescript
-// nova.config.ts
+// nova-pm.config.ts
 export default {
   apps: [{
     name: "my-app",
@@ -88,7 +88,7 @@ export default {
 **Identify resource-heavy processes:**
 
 ```bash
-nova monit
+nova-pm monit
 ```
 
 **Set memory limits to auto-restart processes that exceed a threshold:**
@@ -106,11 +106,11 @@ export default {
 **For CPU issues**, check if you are running more instances than available CPU cores:
 
 ```bash
-nova scale my-app 4  # Match to your core count
+nova-pm scale my-app 4  # Match to your core count
 ```
 
 <Callout type="info">
-Use `nova metrics <app-name>` to view historical CPU and memory trends and identify when spikes occur.
+Use `nova-pm metrics <app-name>` to view historical CPU and memory trends and identify when spikes occur.
 </Callout>
 
 ## Port Conflicts
@@ -147,8 +147,8 @@ export default {
 
 ```bash
 # Reset ownership of the NovaPM directory
-sudo chown -R $(whoami) ~/.nova
-chmod -R 755 ~/.nova
+sudo chown -R $(whoami) ~/.novapm
+chmod -R 755 ~/.novapm
 ```
 
 <Callout type="warning">
@@ -163,13 +163,13 @@ Never run NovaPM with `sudo` in production. Instead, fix the underlying permissi
 
 ```bash
 # Check log sizes
-du -sh ~/.nova/logs/*
+du -sh ~/.novapm/logs/*
 
 # Flush all logs
-nova flush
+nova-pm flush
 
 # Flush logs for a specific app
-nova flush <app-name>
+nova-pm flush <app-name>
 ```
 
 **Configure log rotation in your config:**
@@ -204,25 +204,25 @@ export default {
 
 NovaPM uses an internal database to track process state. If it becomes corrupted:
 
-**Symptoms:** `nova status` returns garbled data or errors, processes show incorrect state.
+**Symptoms:** `nova-pm status` returns garbled data or errors, processes show incorrect state.
 
 **Recovery steps:**
 
 ```bash
 # Stop the daemon
-nova daemon stop
+nova-pm daemon stop
 
 # Back up the corrupted database
-cp ~/.nova/db/nova.db ~/.nova/db/nova.db.backup
+cp ~/.novapm/db/nova-pm.db ~/.novapm/db/nova-pm.db.backup
 
 # Remove the corrupted database
-rm ~/.nova/db/nova.db
+rm ~/.novapm/db/nova-pm.db
 
 # Restart the daemon (a fresh database will be created)
-nova daemon start
+nova-pm daemon start
 
 # Re-register your applications
-nova start nova.config.ts
+nova-pm start nova-pm.config.ts
 ```
 
 <Callout type="warning">
@@ -233,18 +233,18 @@ This will reset all process metadata including restart counts and uptime history
 
 | Error Message | Cause | Solution |
 |---|---|---|
-| `ECONNREFUSED 127.0.0.1:9876` | Daemon not running | Run `nova daemon start` |
+| `ECONNREFUSED 127.0.0.1:9876` | Daemon not running | Run `nova-pm daemon start` |
 | `EADDRINUSE :::3000` | Port already in use | Kill the conflicting process or change ports |
 | `ENOMEM` | System out of memory | Reduce instances or set `max_memory_restart` |
-| `EACCES /home/user/.nova` | Permission denied | Fix ownership with `chown` |
+| `EACCES /home/user/.novapm` | Permission denied | Fix ownership with `chown` |
 | `Script not found` | Invalid script path in config | Verify the `script` path is correct and the file exists |
-| `Maximum restart count reached` | Too many rapid restarts | Fix the root cause, then `nova restart <app>` |
+| `Maximum restart count reached` | Too many rapid restarts | Fix the root cause, then `nova-pm restart <app>` |
 | `Database locked` | Concurrent daemon access | Stop all daemons and restart a single instance |
 
 ## Getting More Help
 
 If your issue is not covered here:
 
-1. Run `nova report` to generate a diagnostic report
+1. Run `nova-pm report` to generate a diagnostic report
 2. Check the [GitHub Issues](https://github.com/nova-pm/nova/issues) for known problems
-3. Include daemon logs (`~/.nova/logs/daemon.log`) when filing bug reports
+3. Include daemon logs (`~/.novapm/logs/daemon.log`) when filing bug reports
