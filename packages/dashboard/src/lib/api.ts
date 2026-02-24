@@ -138,9 +138,7 @@ function transformProcess(raw: any): ProcessInfo {
   const metrics = raw.metrics || {};
   const startedAt = raw.startedAt ? new Date(raw.startedAt).getTime() : 0;
   const uptime =
-    startedAt && raw.status === 'online'
-      ? Math.floor((Date.now() - startedAt) / 1000)
-      : 0;
+    startedAt && raw.status === 'online' ? Math.floor((Date.now() - startedAt) / 1000) : 0;
 
   return {
     id: String(raw.id),
@@ -153,9 +151,7 @@ function transformProcess(raw: any): ProcessInfo {
     uptime,
     script: raw.script || '',
     cwd: raw.cwd || '',
-    createdAt: raw.createdAt
-      ? new Date(raw.createdAt).toISOString()
-      : '',
+    createdAt: raw.createdAt ? new Date(raw.createdAt).toISOString() : '',
   };
 }
 
@@ -175,9 +171,7 @@ function transformLog(raw: any, index: number): LogEntry {
     id: raw.id ? String(raw.id) : `log-${Date.now()}-${index}`,
     processId: String(raw.processId),
     processName: raw.processName || '',
-    timestamp: raw.timestamp
-      ? new Date(raw.timestamp).toISOString()
-      : new Date().toISOString(),
+    timestamp: raw.timestamp ? new Date(raw.timestamp).toISOString() : new Date().toISOString(),
     level,
     message: raw.message || '',
   };

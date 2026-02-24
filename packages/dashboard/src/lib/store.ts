@@ -104,8 +104,7 @@ export const useAppStore = create<AppState>((set) => ({
       set((state) => ({ toasts: state.toasts.filter((t) => t.id !== id) }));
     }, 4000);
   },
-  removeToast: (id) =>
-    set((state) => ({ toasts: state.toasts.filter((t) => t.id !== id) })),
+  removeToast: (id) => set((state) => ({ toasts: state.toasts.filter((t) => t.id !== id) })),
 
   // Settings
   refreshInterval: loadSetting<number>('refreshInterval', 10),
