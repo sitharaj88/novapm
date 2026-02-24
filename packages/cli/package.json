@@ -1,6 +1,6 @@
 {
   "name": "@novapm/cli",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "CLI interface for NovaPM",
   "license": "MIT",
   "author": "Sitharaj Seenviasan",

@@ -1,0 +1,19 @@
+# @novapm/agent
+
+## 2.0.0
+
+### Major Changes
+
+- fc814d8: Release v1.0.0: Complete NovaPM implementation across all 6 phases.
+  - Phase 1: Core process management with ProcessManager, EventBus, and SQLite persistence
+  - Phase 2: Full CLI with 14 commands and JSON-RPC 2.0 IPC protocol
+  - Phase 3: Log aggregation, rotation, metrics collection, and health monitoring
+  - Phase 4: AI engine with anomaly detection, auto-scaling, predictive scaling, and root cause analysis
+  - Phase 5: Plugin system with SDK and 6 official plugins (Slack, Discord, Email, Prometheus, Docker, GitHub Deploy)
+  - Phase 6: Multi-server agent with secure channels, discovery, and rolling deployments
+  - 1,543 tests across 47 test files
+
+### Patch Changes
+
+- Updated dependencies [fc814d8]
+  - @novapm/shared@2.0.0

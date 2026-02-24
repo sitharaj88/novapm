@@ -1,6 +1,6 @@
 {
   "name": "@novapm/core",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "Core daemon and process management for NovaPM",
   "license": "MIT",
   "author": "Sitharaj Seenviasan",
