@@ -7,5 +7,7 @@ const withNextra = nextra({
 
 export default withNextra({
   output: 'export',
+  basePath: '/novapm',
+  assetPrefix: '/novapm/',
   images: { unoptimized: true },
 });

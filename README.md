@@ -19,7 +19,7 @@
     <a href="https://www.npmjs.com/package/novapm"><img src="https://img.shields.io/npm/v/novapm.svg" alt="npm version" /></a>
     <a href="https://www.npmjs.com/package/novapm"><img src="https://img.shields.io/npm/dm/novapm.svg" alt="npm downloads" /></a>
     <a href="https://github.com/sitharaj88/novapm/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="License" /></a>
-    <a href="https://novapm.dev"><img src="https://img.shields.io/badge/docs-novapm.dev-purple.svg" alt="Documentation" /></a>
+    <a href="https://sitharaj88.github.io/novapm"><img src="https://img.shields.io/badge/docs-Documentation-purple.svg" alt="Documentation" /></a>
   </p>
 </div>
 
