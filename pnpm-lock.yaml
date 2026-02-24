@@ -138,6 +138,9 @@ importers:
         specifier: ^3.0.2
         version: 3.0.2
     devDependencies:
+      '@novapm/dashboard':
+        specifier: workspace:*
+        version: link:../dashboard
       '@types/better-sqlite3':
         specifier: ^7.6.12
         version: 7.6.13
