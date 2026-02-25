@@ -7,6 +7,12 @@ const config: DocsThemeConfig = {
     link: 'https://github.com/sitharaj88/novapm',
   },
   docsRepositoryBase: 'https://github.com/sitharaj88/novapm/tree/main/docs',
+  editLink: {
+    component: null,
+  },
+  feedback: {
+    content: null,
+  },
   footer: {
     text: (
       <span>
