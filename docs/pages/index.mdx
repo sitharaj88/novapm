@@ -1,15 +1,15 @@
 # NovaPM
 
-**Next-generation AI-powered process manager**
+**Next-generation AI-powered process manager for Node.js**
 
 NovaPM is a modern, production-grade replacement for PM2. It features AI-driven auto-scaling
-and anomaly detection, a beautiful web dashboard, multi-server distributed management,
-and a plugin ecosystem.
+and anomaly detection, a beautiful web dashboard with dark/light theme, multi-server distributed
+management, and a plugin ecosystem -- all built in TypeScript with strict mode.
 
 ## Quick Start
 
 ```bash
-# Install
+# Install globally
 npm install -g @novapm/cli
 
 # Start a process
@@ -26,18 +26,52 @@ nova-pm dashboard --open
 
 | Feature | PM2 | NovaPM |
 |---------|-----|--------|
-| Process Management | ✅ | ✅ |
-| Cluster Mode | ✅ | ✅ |
-| Log Management | ✅ | ✅ Enhanced |
-| Web Dashboard | Basic | Beautiful, Real-time |
-| AI Anomaly Detection | ❌ | ✅ |
-| Auto-Scaling | ❌ | ✅ |
-| Natural Language Ops | ❌ | ✅ |
-| Plugin System | ❌ | ✅ |
-| Multi-Server | Limited | Full Agent-Controller |
-| Health Checks | Basic | HTTP, TCP, Script |
-| TypeScript | Partial | Full Strict Mode |
-| Metrics Storage | None | SQLite Time-Series |
+| Process Management | Yes | Yes |
+| Cluster Mode | Yes | Yes |
+| Log Management | Yes | Enhanced (JSON, rotation, streaming) |
+| Web Dashboard | Basic | Real-time, mobile-responsive, dark/light theme |
+| AI Anomaly Detection | No | Yes (Z-Score, IQR, Pattern, Rate-of-Change) |
+| Auto-Scaling | No | Yes (predictive + threshold-based) |
+| Natural Language Ops | No | Yes (OpenAI, Anthropic, Ollama) |
+| Plugin System | No | Yes (6 official plugins) |
+| Multi-Server | Limited | Full agent-controller architecture |
+| Health Checks | Basic | HTTP, TCP, Script-based |
+| TypeScript | Partial | Full strict mode |
+| Metrics Storage | None | SQLite time-series with downsampling |
+
+## Key Features
+
+- **Process Management** -- Start, stop, restart, scale, and monitor Node.js applications
+- **Web Dashboard** -- Real-time UI with charts, logs, dark/light theme, and mobile support
+- **AI Engine** -- Anomaly detection, auto-scaling, performance advisor, and LLM integration
+- **Multi-Server** -- Agent-controller architecture with rolling, canary, and blue-green deploys
+- **Plugin Ecosystem** -- Slack, Discord, Email, Prometheus, Docker, and GitHub Deploy plugins
+- **Health Checks** -- HTTP, TCP, and script-based monitoring with auto-restart
+- **REST API & WebSocket** -- Full API for programmatic access and real-time data streaming
+- **PM2 Compatible** -- Reads `ecosystem.config.js` for easy migration
+
+## Architecture
+
+NovaPM is a monorepo with 13 packages:
+
+```
+packages/
+├── shared/       # Types, constants, Zod schemas
+├── core/         # Daemon, process manager, HTTP API, dashboard serving
+├── cli/          # Command-line interface (16 commands)
+├── dashboard/    # Next.js web dashboard (static export)
+├── ai-engine/    # Anomaly detection, auto-scaling, LLM
+├── agent/        # Multi-server agent-controller
+└── plugin-sdk/   # Plugin development SDK
+
+plugins/
+├── plugin-slack/           # Slack notifications
+├── plugin-discord/         # Discord notifications
+├── plugin-email/           # Email notifications
+├── plugin-prometheus/      # Prometheus exporter
+├── plugin-docker/          # Docker awareness
+└── plugin-github-deploy/   # GitHub deployments
+```
 
 ## Getting Started
 
@@ -45,3 +79,19 @@ nova-pm dashboard --open
 - [Quick Start Guide](/getting-started/quick-start)
 - [Configuration](/configuration/config-file)
 - [CLI Reference](/cli/commands)
+- [Dashboard](/dashboard)
+- [AI Features](/ai)
+- [Plugins](/plugins)
+- [API Reference](/api)
+
+## Links
+
+- [GitHub Repository](https://github.com/sitharaj88/novapm)
+- [npm Package](https://www.npmjs.com/package/@novapm/cli)
+- [Report Issues](https://github.com/sitharaj88/novapm/issues)
+
+---
+
+Built by [Sitharaj Seenviasan](https://sitharaj.in) | [LinkedIn](https://linkedin.com/in/sitharaj08) | [GitHub](https://github.com/sitharaj88) | [Buy Me a Coffee](https://buymeacoffee.com/sitharaj88)
+
+MIT License -- Copyright (c) 2026

@@ -8,7 +8,15 @@ const config: DocsThemeConfig = {
   },
   docsRepositoryBase: 'https://github.com/sitharaj88/novapm/tree/main/docs',
   footer: {
-    text: 'NovaPM — Next-generation AI-powered process manager',
+    text: (
+      <span>
+        MIT {new Date().getFullYear()} ©{' '}
+        <a href="https://sitharaj.in" target="_blank" rel="noopener noreferrer">
+          Sitharaj Seenviasan
+        </a>{' '}
+        — NovaPM
+      </span>
+    ),
   },
   useNextSeoProps() {
     return { titleTemplate: '%s – NovaPM' };
@@ -17,7 +25,8 @@ const config: DocsThemeConfig = {
     <>
       <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       <meta property="og:title" content="NovaPM Documentation" />
-      <meta property="og:description" content="Next-generation AI-powered process manager" />
+      <meta property="og:description" content="Next-generation AI-powered process manager for Node.js" />
+      <meta name="author" content="Sitharaj Seenviasan" />
     </>
   ),
   sidebar: {
